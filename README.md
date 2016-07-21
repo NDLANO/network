@@ -1,5 +1,5 @@
 # NETWORK
-Library that provides common network functionality to ndla components.
+Library that provides common network functionality to NDLA components.
 
 # Building and distribution
 
