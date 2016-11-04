@@ -49,12 +49,12 @@ class SecretsTest extends UnitSuite {
     secretsAttempt match {
       case Failure(err) => fail(err)
       case Success(secrets) => {
-        secrets(PropertyKeys.MetaUserNameKey) should equal (Some("database-user"))
-        secrets(PropertyKeys.MetaPasswordKey) should equal (Some("database-password"))
-        secrets(PropertyKeys.MetaResourceKey) should equal (Some("database-name"))
-        secrets(PropertyKeys.MetaServerKey) should equal (Some("database-host"))
-        secrets(PropertyKeys.MetaPortKey) should equal (Some("1234"))
-        secrets(PropertyKeys.MetaSchemaKey) should equal (Some("database-schema"))
+        secrets("user") should equal (Some("database-user"))
+        secrets("password") should equal (Some("database-password"))
+        secrets("database") should equal (Some("database-name"))
+        secrets("host") should equal (Some("database-host"))
+        secrets("port") should equal (Some("1234"))
+        secrets("schema") should equal (Some("database-schema"))
       }
     }
   }
