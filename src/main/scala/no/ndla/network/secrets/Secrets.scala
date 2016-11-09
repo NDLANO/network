@@ -18,7 +18,7 @@ import scala.io.Source
 import scala.util.{Properties, Success, Try}
 
 object Secrets {
-  def readSecrets(secretsFile: String): Try[Map[String, Option[String]]] = {
+  def readSecrets(secretsFile: String): Try[Map[String, String]] = {
     val amazonClient = new AmazonS3Client(new DefaultAWSCredentialsProviderChain())
     amazonClient.setRegion(Region.getRegion(Regions.EU_CENTRAL_1))
 
@@ -37,7 +37,7 @@ object PropertyKeys {
 
 class Secrets(amazonClient: AmazonS3Client, environment: String, secretsFile: String) {
 
-  def readSecrets(): Try[Map[String, Option[String]]] = {
+  def readSecrets(): Try[Map[String, String]] = {
     implicit val formats = org.json4s.DefaultFormats
 
     environment match {
@@ -51,12 +51,12 @@ class Secrets(amazonClient: AmazonS3Client, environment: String, secretsFile: St
 
         secrets.map(s => {
           Map(
-            MetaResourceKey -> Some(s.database),
-            MetaServerKey -> Some(s.host),
-            MetaUserNameKey -> Some(s.user),
-            MetaPasswordKey -> Some(s.password),
-            MetaPortKey -> Some(s.port),
-            MetaSchemaKey -> Some(s.schema)
+            MetaResourceKey -> s.database,
+            MetaServerKey -> s.host,
+            MetaUserNameKey -> s.user,
+            MetaPasswordKey -> s.password,
+            MetaPortKey -> s.port,
+            MetaSchemaKey -> s.schema
           )
         })
       }
