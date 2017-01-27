@@ -15,7 +15,7 @@ import org.mockito.Mockito._
 class DomainsTest extends UnitSuite {
 
   test("That local env returns localhost") {
-    Domains.get("local") should equal("http://localhost")
+    Domains.get("local") should equal("http://proxy.ndla-local")
   }
 
   test("That prod env returns prod") {
