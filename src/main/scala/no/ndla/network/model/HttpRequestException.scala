@@ -13,3 +13,5 @@ import scalaj.http.HttpResponse
 class HttpRequestException(message: String, httpResponse: Option[HttpResponse[String]] = None) extends RuntimeException(message) {
   def is404:Boolean = httpResponse.exists(_.isCodeInRange(404, 404))
 }
+
+class AuthorizationException(message: String) extends RuntimeException(message)
