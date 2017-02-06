@@ -17,7 +17,7 @@ import org.json4s.native.Serialization.read
 import scala.util.{Failure, Success, Try}
 
 
-object User extends LazyLogging {
+object AuthUser extends LazyLogging {
   val AuthorizationHeader = "Authorization"
 
   private val userId = new ThreadLocal[Option[String]]
