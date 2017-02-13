@@ -13,8 +13,8 @@ lazy val network = (project in file(".")).
   settings(commonSettings: _*).
   settings(
     name := "network",
-    javacOptions ++= Seq("-source", "1.7", "-target", "1.7"),
-    scalacOptions := Seq("-target:jvm-1.7"),
+    javacOptions ++= Seq("-source", "1.8", "-target", "1.8"),
+    scalacOptions := Seq("-target:jvm-1.8"),
     libraryDependencies ++= Seq(
       "org.json4s"   %% "json4s-jackson" % "3.3.0",
       "org.json4s"   %% "json4s-native" % "3.3.0",
