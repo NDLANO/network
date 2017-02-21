@@ -1,8 +1,8 @@
 language: scala
 scala:
-    - 2.11.8
+    - 2.12.1
 jdk:
-  - oraclejdk7
+  - oraclejdk8
 # Use container-based infrastructure
 sudo: false
 # These directories are cached to S3 at the end of the build
