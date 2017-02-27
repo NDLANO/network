@@ -1,4 +1,5 @@
 val Scalaversion = "2.12.1"
+val CrossScalaVersions = "2.11.8"
 val ScalaTestVersion = "3.0.1"
 val MockitoVersion = "1.10.19"
 val AwsSdkversion = "1.11.93"
@@ -7,7 +8,8 @@ val Json4sVersion = "3.5.0"
 
 lazy val commonSettings = Seq(
   organization := "ndla",
-  scalaVersion := Scalaversion
+  scalaVersion := Scalaversion,
+  crossScalaVersions := Seq(CrossScalaVersions, Scalaversion)
 )
 
 lazy val network = (project in file(".")).

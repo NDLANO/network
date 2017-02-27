@@ -1,4 +1,4 @@
 #!/bin/bash
 
-sbt package
-sbt test
+sbt '+ package'
+sbt '+ test'
