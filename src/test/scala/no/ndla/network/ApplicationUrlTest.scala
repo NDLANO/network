@@ -47,35 +47,66 @@ class ApplicationUrlTest extends UnitSuite {
     ApplicationUrl.get should equal(s"https://${servername}${path}/")
   }
 
-  test("That applicationUrl returns http when header is http") {
-    when(httpRequest.getHeader(ApplicationUrl.ProtocolHeader)).thenReturn("http")
+  test("That applicationUrl returns http when only x-forwarded-proto header and it is http") {
+    when(httpRequest.getHeader(ApplicationUrl.X_FORWARDED_PROTO_HEADER)).thenReturn("http")
     ApplicationUrl.set(httpRequest)
     ApplicationUrl.get should equal(s"http://${servername}${path}/")
   }
 
-  test("That applicationUrl returns https when header is https") {
-    when(httpRequest.getHeader(ApplicationUrl.ProtocolHeader)).thenReturn("https")
+  test("That applicationUrl returns https when only x-forwarded-proto header and it is https") {
+    when(httpRequest.getHeader(ApplicationUrl.X_FORWARDED_PROTO_HEADER)).thenReturn("https")
     ApplicationUrl.set(httpRequest)
     ApplicationUrl.get should equal(s"https://${servername}${path}/")
   }
 
-  test("That https header trumps http port") {
-    when(httpRequest.getHeader(ApplicationUrl.ProtocolHeader)).thenReturn("https")
+  test("That x-forwarded-proto header for https trumps http port") {
+    when(httpRequest.getHeader(ApplicationUrl.X_FORWARDED_PROTO_HEADER)).thenReturn("https")
     ApplicationUrl.set(httpRequest)
     when(httpRequest.getServerPort).thenReturn(80)
     ApplicationUrl.get should equal(s"https://${servername}${path}/")
   }
 
-  test("That http header trumps https port") {
-    when(httpRequest.getHeader(ApplicationUrl.ProtocolHeader)).thenReturn("http")
+  test("That x-forwarded-proto header for http trumps https port") {
+    when(httpRequest.getHeader(ApplicationUrl.X_FORWARDED_PROTO_HEADER)).thenReturn("http")
     ApplicationUrl.set(httpRequest)
     when(httpRequest.getServerPort).thenReturn(443)
     ApplicationUrl.get should equal(s"http://${servername}${path}/")
   }
 
-  test("That applicationUrl returns default when header is unrecognized") {
-    when(httpRequest.getHeader(ApplicationUrl.ProtocolHeader)).thenReturn("tullogtoys")
+  test("That applicationUrl returns default when headers is unrecognized") {
+    when(httpRequest.getHeader(ApplicationUrl.X_FORWARDED_PROTO_HEADER)).thenReturn("tullogtoys")
+    when(httpRequest.getHeader(ApplicationUrl.FORWARDED_HEADER)).thenReturn("for=1.2.3.4;proto=tullogtoys")
     ApplicationUrl.set(httpRequest)
     ApplicationUrl.get should equal(s"${scheme}://${servername}:${port}${path}/")
+  }
+
+  test("That forwarded header for https trumps http port and x-forwarded-header") {
+    when(httpRequest.getHeader(ApplicationUrl.X_FORWARDED_PROTO_HEADER)).thenReturn("http")
+    when(httpRequest.getHeader(ApplicationUrl.FORWARDED_HEADER)).thenReturn("for=1.2.3.4;proto=https")
+    ApplicationUrl.set(httpRequest)
+    when(httpRequest.getServerPort).thenReturn(80)
+    ApplicationUrl.get should equal(s"https://${servername}${path}/")
+  }
+
+  test("That forwarded header for http trumps https port and x-forwarded-header") {
+    when(httpRequest.getHeader(ApplicationUrl.X_FORWARDED_PROTO_HEADER)).thenReturn("https")
+    when(httpRequest.getHeader(ApplicationUrl.FORWARDED_HEADER)).thenReturn("for=1.2.3.4;proto=http")
+    ApplicationUrl.set(httpRequest)
+    when(httpRequest.getServerPort).thenReturn(443)
+    ApplicationUrl.get should equal(s"http://${servername}${path}/")
+  }
+
+  test("That applicationUrl returns x-forwarded-proto-header when forwarded-header is unrecognized format") {
+    when(httpRequest.getHeader(ApplicationUrl.X_FORWARDED_PROTO_HEADER)).thenReturn("https")
+    when(httpRequest.getHeader(ApplicationUrl.FORWARDED_HEADER)).thenReturn("tullogtoys")
+    ApplicationUrl.set(httpRequest)
+    ApplicationUrl.get should equal(s"https://${servername}${path}/")
+  }
+
+  test("That applicationUrl returns x-forwarded-proto-header when forwarded-header is unrecognized") {
+    when(httpRequest.getHeader(ApplicationUrl.X_FORWARDED_PROTO_HEADER)).thenReturn("https")
+    when(httpRequest.getHeader(ApplicationUrl.FORWARDED_HEADER)).thenReturn("for=1.2.3.4;proto=tullogtoys")
+    ApplicationUrl.set(httpRequest)
+    ApplicationUrl.get should equal(s"https://${servername}${path}/")
   }
 }
