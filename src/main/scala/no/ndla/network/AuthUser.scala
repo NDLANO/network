@@ -30,6 +30,8 @@ object AuthUser extends LazyLogging {
   def getRoles: List[String] = userRoles.get
   def getName: Option[String] = userName.get
 
+  def hasRole(role: String): Boolean = getRoles.contains(role)
+
   def clear(): Unit = {
     userId.remove()
     userRoles.remove()
