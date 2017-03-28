@@ -23,6 +23,6 @@ class DomainsTest extends UnitSuite {
   }
 
   test("That ant other env returns any other env") {
-    Domains.get("anyotherenv") should equal("http://anyotherenv.api.ndla.no")
+    Domains.get("anyotherenv") should equal("https://anyotherenv.api.ndla.no")
   }
 }
