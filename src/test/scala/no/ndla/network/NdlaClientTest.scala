@@ -8,6 +8,8 @@
 
 package no.ndla.network
 
+import javax.servlet.http.HttpServletRequest
+
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.TryValues._
@@ -117,5 +119,56 @@ class NdlaClientTest extends UnitSuite with NdlaClient {
 
     verify(httpRequestMock, times(1)).auth(eqTo(user), eqTo(password))
     verify(httpRequestMock, never()).header(any[String], any[String])
+  }
+
+  test("That Authorization header is added to request if set on Thread") {
+    val servletRequestMock = mock[HttpServletRequest]
+    val httpRequestMock = mock[HttpRequest]
+    val httpResponseMock = mock[HttpResponse[String]]
+    val authHeaderKey = "Authorization"
+    val authHeader = "abc"
+
+    when(servletRequestMock.getHeader(eqTo(authHeaderKey))).thenReturn(authHeader)
+    AuthUser.set(servletRequestMock)
+
+    when(httpRequestMock.header(eqTo(authHeaderKey), eqTo(authHeader))).thenReturn(httpRequestMock)
+    when(httpRequestMock.asString).thenReturn(httpResponseMock)
+    when(httpResponseMock.isError).thenReturn(false)
+    when(httpResponseMock.body).thenReturn(ParseableContent)
+
+    val result = ndlaClient.fetch[TestObject](httpRequestMock)
+    result should be a 'success
+    result.get.id should equal("1")
+    result.get.verdi should equal("This is the value")
+
+    verify(httpRequestMock, times(1)).header(eqTo(authHeaderKey), eqTo(authHeader))
+  }
+
+  test("That Basic Auth is applied after Auth Header if supplied") {
+    val servletRequestMock = mock[HttpServletRequest]
+    val httpRequestMock = mock[HttpRequest]
+    val httpResponseMock = mock[HttpResponse[String]]
+    val authHeaderKey = "Authorization"
+    val authHeader = "abc"
+    val user = "user"
+    val password = "password"
+
+    when(servletRequestMock.getHeader(eqTo(authHeaderKey))).thenReturn(authHeader)
+    AuthUser.set(servletRequestMock)
+
+    when(httpRequestMock.auth(eqTo(user), eqTo(password))).thenReturn(httpRequestMock)
+    when(httpRequestMock.header(eqTo(authHeaderKey), eqTo(authHeader))).thenReturn(httpRequestMock)
+    when(httpRequestMock.asString).thenReturn(httpResponseMock)
+    when(httpResponseMock.isError).thenReturn(false)
+    when(httpResponseMock.body).thenReturn(ParseableContent)
+
+    val result = ndlaClient.fetch[TestObject](httpRequestMock, Some(user), Some(password))
+    result should be a 'success
+    result.get.id should equal("1")
+    result.get.verdi should equal("This is the value")
+
+    verify(httpRequestMock, times(1)).header(eqTo(authHeaderKey), eqTo(authHeader))
+    verify(httpRequestMock, times(1)).auth(eqTo(user), eqTo(password))
+
   }
 }

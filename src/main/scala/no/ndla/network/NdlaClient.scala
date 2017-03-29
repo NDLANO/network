@@ -26,9 +26,14 @@ trait NdlaClient {
         case Some(correlationId) => request.header("X-Correlation-ID", correlationId)
       }
 
+      val requestWithAuthHeader = AuthUser.getHeader match {
+        case Some(auth) => request.header("Authorization", auth)
+        case None => requestWithCorrelationId
+      }
+
       val requestWithBasicAuth = if (user.isDefined && password.isDefined) {
-        requestWithCorrelationId.auth(user.get, password.get)
-      } else requestWithCorrelationId
+        requestWithAuthHeader.auth(user.get, password.get)
+      } else requestWithAuthHeader
 
       for {
         httpResponse <- doRequest(requestWithBasicAuth)
