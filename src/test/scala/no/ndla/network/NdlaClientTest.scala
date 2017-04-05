@@ -44,11 +44,12 @@ class NdlaClientTest extends UnitSuite with NdlaClient {
     when(httpResponseMock.isError).thenReturn(true)
     when(httpResponseMock.code).thenReturn(123)
     when(httpResponseMock.statusLine).thenReturn("status")
+    when(httpResponseMock.body).thenReturn("body-with-error")
 
     val result = ndlaClient.fetch[TestObject](httpRequestMock)
 
     result should be a 'failure
-    result.failure.exception.getMessage should equal("Received error 123 status when calling someUrl")
+    result.failure.exception.getMessage should equal("Received error 123 status when calling someUrl. Body was body-with-error")
   }
 
   test("That a HttpRequestException is returned when response is not parseable") {
