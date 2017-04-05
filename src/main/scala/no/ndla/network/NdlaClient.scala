@@ -8,6 +8,7 @@
 
 package no.ndla.network
 
+import com.typesafe.scalalogging.LazyLogging
 import no.ndla.network.model.HttpRequestException
 import org.json4s.jackson.JsonMethods._
 
@@ -17,7 +18,7 @@ import scalaj.http.{HttpRequest, HttpResponse}
 trait NdlaClient {
   val ndlaClient: NdlaClient
 
-  class NdlaClient {
+  class NdlaClient extends LazyLogging {
     implicit val formats = org.json4s.DefaultFormats
 
     def fetch[A](request: HttpRequest, user: Option[String] = None, password: Option[String] = None)(implicit mf: Manifest[A]): Try[A] = {
@@ -46,7 +47,7 @@ trait NdlaClient {
         response.isError match {
           case false => Success(response)
           case true => {
-            Failure(new HttpRequestException(s"Received error ${response.code} ${response.statusLine} when calling ${request.url}", Some(response)))
+            Failure(new HttpRequestException(s"Received error ${response.code} ${response.statusLine} when calling ${request.url}. Body was ${response.body}", Some(response)))
           }
         }
       })
@@ -55,7 +56,10 @@ trait NdlaClient {
     private def parseResponse[A](response: HttpResponse[String])(implicit mf: Manifest[A]): Try[A] = {
       Try(parse(response.body).camelizeKeys.extract[A]) match {
         case Success(extracted) => Success(extracted)
-        case Failure(ex) => Failure(new HttpRequestException(s"Could not parse response ${response.body}", Some(response)))
+        case Failure(ex) => {
+          logger.warn("Could not parse response", ex)
+          Failure(new HttpRequestException(s"Could not parse response ${response.body}", Some(response)))
+        }
       }
     }
   }
