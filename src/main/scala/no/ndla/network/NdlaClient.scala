@@ -21,23 +21,27 @@ trait NdlaClient {
   class NdlaClient extends LazyLogging {
     implicit val formats = org.json4s.DefaultFormats
 
-    def fetch[A](request: HttpRequest, user: Option[String] = None, password: Option[String] = None)(implicit mf: Manifest[A]): Try[A] = {
-      val requestWithCorrelationId = CorrelationID.get match {
-        case None => request
-        case Some(correlationId) => request.header("X-Correlation-ID", correlationId)
-      }
 
-      val requestWithAuthHeader = AuthUser.getHeader match {
-        case Some(auth) => request.header("Authorization", auth)
-        case None => requestWithCorrelationId
-      }
+    def fetch[A](request: HttpRequest)(implicit mf: Manifest[A]): Try[A] = {
+      doFetch(
+        addCorrelationId(request))
+    }
 
-      val requestWithBasicAuth = if (user.isDefined && password.isDefined) {
-        requestWithAuthHeader.auth(user.get, password.get)
-      } else requestWithAuthHeader
+    def fetchWithBasicAuth[A](request: HttpRequest, user: String, password: String)(implicit mf: Manifest[A]): Try[A] = {
+      doFetch(
+        addCorrelationId(
+          addBasicAuth(request, user, password)))
+    }
 
+    def fetchWithForwardedAuth[A](request: HttpRequest)(implicit mf: Manifest[A]): Try[A] = {
+      doFetch(
+        addCorrelationId(
+          addForwardedAuth(request)))
+    }
+
+    private def doFetch[A](request: HttpRequest)(implicit mf: Manifest[A]): Try[A] = {
       for {
-        httpResponse <- doRequest(requestWithBasicAuth)
+        httpResponse <- doRequest(request)
         bodyObject <- parseResponse[A](httpResponse)(mf)
       } yield bodyObject
     }
@@ -62,6 +66,17 @@ trait NdlaClient {
         }
       }
     }
-  }
 
+    private def addCorrelationId(request: HttpRequest) = CorrelationID.get match {
+      case None => request
+      case Some(correlationId) => request.header("X-Correlation-ID", correlationId)
+    }
+
+    private def addBasicAuth(request: HttpRequest, user: String, password: String) = request.auth(user, password)
+
+    private def addForwardedAuth(request: HttpRequest) = AuthUser.getHeader match {
+      case Some(auth) => request.header("Authorization", auth)
+      case None => request
+    }
+  }
 }
