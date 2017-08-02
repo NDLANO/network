@@ -8,14 +8,10 @@
 
 package no.ndla.network
 
-import javax.servlet.http.HttpServletRequest
-
-import org.mockito.Mockito._
-
 class DomainsTest extends UnitSuite {
 
   test("That local env returns localhost") {
-    Domains.get("local") should equal("http://proxy.ndla-local")
+    Domains.get("local") should equal("http://api-gateway.ndla-local")
   }
 
   test("That prod env returns prod") {
