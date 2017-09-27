@@ -12,7 +12,7 @@ import javax.servlet.http.HttpServletRequest
 import no.ndla.network.model.JWTClaims
 import pdi.jwt.{JwtJson4s, JwtOptions}
 
-import scala.util.{Failure, Success}
+import scala.util.{Failure, Properties, Success}
 
 
 class JWTExtractor(request: HttpServletRequest) {
@@ -31,7 +31,13 @@ class JWTExtractor(request: HttpServletRequest) {
   }
 
   def extractUserRoles(): List[String] = {
-    jwtClaims.map(_.scope).getOrElse(List.empty)
+    val rawRoles = jwtClaims.map(_.scope).getOrElse(List.empty)
+    val env = Properties.envOrElse("NDLA_ENVIRONMENT", "local")
+    val envSuffix = s"-$env:"
+    val roles = rawRoles.filter(_.contains(envSuffix)).map(_.replace(envSuffix, ":"))
+    // Legacy-support. Don't remove roles without env-suffix. May be deleted when all clients are migrated to auth0 and the auth component is deleted
+    val legacyRoles = rawRoles.filter(!_.contains("-"))
+    roles ++ legacyRoles
   }
 
   def extractUserName(): Option[String] = {
