@@ -27,7 +27,7 @@ lazy val network = (project in file(".")).
       "org.mockito" % "mockito-all" % MockitoVersion % "test",
       "javax.servlet" % "javax.servlet-api" % "3.1.0" % "provided;test",
       "com.amazonaws" % "aws-java-sdk-s3" % AwsSdkversion,
-      "com.jason-goodwin" %% "authentikat-jwt" % "0.4.5")
+      "com.pauldijou" %% "jwt-json4s-native" % "0.14.0")
   )
 
 publishTo := {
