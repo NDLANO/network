@@ -26,10 +26,49 @@ case class JWTClaims(
 
 object JWTClaims {
   implicit val formats = org.json4s.DefaultFormats
+  val ndla_id_key = "https://ndla.no/ndla_id"
+  val user_name_key = "https://ndla.no/user_name"
+  val azp_key = "azp"
+  val scope_key = "scope"
 
   def apply(claims: JwtClaim): JWTClaims = {
-    implicit val formats = org.json4s.DefaultFormats
-    val content = parse(claims.content).extract[Map[String, String]]
-    new JWTClaims(claims.issuer, claims.subject, claims.audience, content.get("azp"), claims.expiration, claims.issuedAt, content.get("scope").map(_.split(' ').toList).getOrElse(List.empty), content.get("https://ndla.no/ndla_id"), content.get("https://ndla.no/user_name"), claims.jwtId)
+    val content = {
+      if (claims.content.contains("\"app_metadata\":")) {
+        // Legacy format. May be discarded when all clients are migrated to new auth0 auth using access tokens (instead of id tokens)
+        legacyTokenParse(claims.content)
+      } else {
+        parse(claims.content).extract[Map[String, String]]
+      }
+    }
+    new JWTClaims(claims.issuer, claims.subject, claims.audience, content.get(azp_key), claims.expiration, claims.issuedAt, content.get(scope_key).map(_.split(' ').toList).getOrElse(List.empty), content.get(ndla_id_key), content.get(user_name_key), claims.jwtId)
   }
+
+  def legacyTokenParse(content: String) = {
+    val legacyContent = parse(content).extract[Map[String, Any]]
+
+    def conditionalEntry(key: String, value: Option[String]) = value match {
+      case Some(v) => Seq(key -> v)
+      case None => Nil
+    }
+
+    def getLegacyRoles = {
+      legacyContent.get("app_metadata").map(_.asInstanceOf[Map[String, Any]]) match {
+        case Some(appMetaData) => appMetaData.get("roles").map(_.asInstanceOf[List[String]]).map(_.mkString(" "))
+        case None => None
+      }
+    }
+
+    def getLegacyNdlaId = {
+      legacyContent.get("app_metadata").map(_.asInstanceOf[Map[String, Any]]) match {
+        case Some(appMetaData) => appMetaData.get("ndla_id").map(_.asInstanceOf[String])
+        case None => None
+      }
+    }
+
+    def getLegacyUserName = legacyContent.get("name").map(_.asInstanceOf[String])
+
+    val contentInNewFormat = Seq(conditionalEntry(azp_key, Some("uknown")) ++ conditionalEntry(scope_key, getLegacyRoles) ++ conditionalEntry(ndla_id_key, getLegacyNdlaId) ++ conditionalEntry(user_name_key, getLegacyUserName))
+    Map(contentInNewFormat.flatten:_*)
+  }
+
 }
