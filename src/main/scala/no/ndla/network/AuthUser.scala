@@ -14,21 +14,30 @@ import no.ndla.network.jwt.JWTExtractor
 
 
 object AuthUser extends LazyLogging {
+  private[this] def ThreadLocalWithDefault[T](default: T) = new ThreadLocal[T] {
+    override protected def initialValue: T = default
+  }
 
-  private val userId = new ThreadLocal[Option[String]]
-  private val userRoles = new ThreadLocal[List[String]]
-  private val userName = new ThreadLocal[Option[String]]
-  private val clientId = new ThreadLocal[Option[String]]
-  private val authHeader = new ThreadLocal[String]
+  private val userId = ThreadLocalWithDefault[Option[String]](None)
+  private val userRoles = ThreadLocalWithDefault[List[String]](List.empty)
+  private val userName = ThreadLocalWithDefault[Option[String]](None)
+  private val clientId = ThreadLocalWithDefault[Option[String]](None)
+  private val authHeader = ThreadLocalWithDefault[String]("")
 
   def set(request: HttpServletRequest): Unit = {
     val jWTExtractor = new JWTExtractor(request)
-    userId.set(jWTExtractor.extractUserId())
-    userRoles.set(jWTExtractor.extractUserRoles())
-    userName.set(jWTExtractor.extractUserName())
-    clientId.set(jWTExtractor.extractClientId())
-    authHeader.set(request.getHeader("Authorization"))
+    setId(jWTExtractor.extractUserId())
+    setRoles(jWTExtractor.extractUserRoles())
+    setName(jWTExtractor.extractUserName())
+    setClientId(jWTExtractor.extractClientId())
+    setHeader(request.getHeader("Authorization"))
   }
+
+  def setId(user: Option[String]): Unit = userId.set(user)
+  def setRoles(roles: List[String]): Unit = userRoles.set(roles)
+  def setName(name: Option[String]): Unit = userName.set(name)
+  def setClientId(client: Option[String]): Unit = clientId.set(client)
+  def setHeader(header: String): Unit = authHeader.set(header)
 
   def get: Option[String] = userId.get
   def getRoles: List[String] = userRoles.get
