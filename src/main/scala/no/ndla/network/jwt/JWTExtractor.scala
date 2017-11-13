@@ -43,4 +43,9 @@ class JWTExtractor(request: HttpServletRequest) {
   def extractUserName(): Option[String] = {
     jwtClaims.flatMap(_.user_name)
   }
+
+  def extractClientId(): Option[String] = {
+    jwtClaims.flatMap(_.client_id)
+  }
+
 }

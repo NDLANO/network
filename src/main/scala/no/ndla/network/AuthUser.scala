@@ -18,6 +18,7 @@ object AuthUser extends LazyLogging {
   private val userId = new ThreadLocal[Option[String]]
   private val userRoles = new ThreadLocal[List[String]]
   private val userName = new ThreadLocal[Option[String]]
+  private val clientId = new ThreadLocal[Option[String]]
   private val authHeader = new ThreadLocal[String]
 
   def set(request: HttpServletRequest): Unit = {
@@ -25,12 +26,14 @@ object AuthUser extends LazyLogging {
     userId.set(jWTExtractor.extractUserId())
     userRoles.set(jWTExtractor.extractUserRoles())
     userName.set(jWTExtractor.extractUserName())
+    clientId.set(jWTExtractor.extractClientId())
     authHeader.set(request.getHeader("Authorization"))
   }
 
   def get: Option[String] = userId.get
   def getRoles: List[String] = userRoles.get
   def getName: Option[String] = userName.get
+  def getClientId: Option[String] = clientId.get
   def getHeader: Option[String] = Option(authHeader.get)
 
   def hasRole(role: String): Boolean = getRoles.contains(role)
@@ -39,6 +42,7 @@ object AuthUser extends LazyLogging {
     userId.remove()
     userRoles.remove()
     userName.remove()
+    clientId.remove()
     authHeader.remove()
   }
 }

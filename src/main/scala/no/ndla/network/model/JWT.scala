@@ -21,15 +21,18 @@ case class JWTClaims(
                       scope: List[String],
                       ndla_id: Option[String],
                       user_name: Option[String],
-                      jti: Option[String]
+                      jti: Option[String],
+                      client_id: Option[String]
                     )
 
 object JWTClaims {
   implicit val formats = org.json4s.DefaultFormats
   val ndla_id_key = "https://ndla.no/ndla_id"
   val user_name_key = "https://ndla.no/user_name"
+  val client_id_key = "https://ndla.no/client_id"
   val azp_key = "azp"
   val scope_key = "scope"
+  val client_id_value_markers = List("client", "netlife", "frontend")
 
   def apply(claims: JwtClaim): JWTClaims = {
     val content = {
@@ -40,7 +43,7 @@ object JWTClaims {
         parse(claims.content).extract[Map[String, String]]
       }
     }
-    new JWTClaims(claims.issuer, claims.subject, claims.audience, content.get(azp_key), claims.expiration, claims.issuedAt, content.get(scope_key).map(_.split(' ').toList).getOrElse(List.empty), content.get(ndla_id_key), content.get(user_name_key), claims.jwtId)
+    new JWTClaims(claims.issuer, claims.subject, claims.audience, content.get(azp_key), claims.expiration, claims.issuedAt, content.get(scope_key).map(_.split(' ').toList).getOrElse(List.empty), content.get(ndla_id_key), content.get(user_name_key), claims.jwtId, content.get(client_id_key))
   }
 
   def legacyTokenParse(content: String) = {
@@ -58,17 +61,21 @@ object JWTClaims {
       }
     }
 
-    def getLegacyNdlaId = {
+    def getLegacyNdlaOrClientId: Option[String] = {
       legacyContent.get("app_metadata").map(_.asInstanceOf[Map[String, Any]]) match {
         case Some(appMetaData) => appMetaData.get("ndla_id").map(_.asInstanceOf[String])
         case None => None
       }
     }
 
+    def getLegacyNdlaId = getLegacyNdlaOrClientId.filter(x => !client_id_value_markers.exists(y => x.indexOf(y) > 0 ))
+
+    def getLegacyClientId = getLegacyNdlaOrClientId.filter(x => client_id_value_markers.exists(y => x.indexOf(y) > 0 ))
+
     def getLegacyUserName = legacyContent.get("name").map(_.asInstanceOf[String])
 
-    val contentInNewFormat = Seq(conditionalEntry(azp_key, Some("uknown")) ++ conditionalEntry(scope_key, getLegacyRoles) ++ conditionalEntry(ndla_id_key, getLegacyNdlaId) ++ conditionalEntry(user_name_key, getLegacyUserName))
-    Map(contentInNewFormat.flatten:_*)
+    val contentInNewFormat = Seq(conditionalEntry(azp_key, Some("uknown")) ++ conditionalEntry(scope_key, getLegacyRoles) ++ conditionalEntry(ndla_id_key, getLegacyNdlaId) ++ conditionalEntry(user_name_key, getLegacyUserName) ++ conditionalEntry(client_id_key, getLegacyClientId))
+    Map(contentInNewFormat.flatten: _*)
   }
 
 }

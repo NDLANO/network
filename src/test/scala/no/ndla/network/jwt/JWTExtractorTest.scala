@@ -100,6 +100,17 @@ class JWTExtractorTest extends UnitSuite {
     val jWTExtractor = new JWTExtractor(request)
     jWTExtractor.extractUserId() should equal(Some("abc123"))
     jWTExtractor.extractUserRoles() should equal(List.empty)
+    jWTExtractor.extractClientId() should be(None)
+  }
+
+  test("That JWTExtractor.extractClientId is set if ndla_id is legacy clientId") {
+    val token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhcHBfbWV0YWRhdGEiOnsibmRsYV9pZCI6ImZkamFza2ZsamRsc2FmZC5lZGl0b3JpYWwtZnJvbnRlbmQifSwiaXNzIjoiaHR0cHM6Ly9zb21lLWRvbWFpbi8iLCJzdWIiOiJnb29nbGUtb2F1dGgyfDEyMyIsImF1ZCI6ImFzZGZhIiwiZXhwIjoxNDg2MDcwMDYzLCJpYXQiOjE0ODYwMzQwNjN9.QQNvAYveIjpMX58Bp5aYA7xByy1xoIbW3V9Tmv0PBik"
+    val request = mock[HttpServletRequest]
+    when(request.getHeader("Authorization")).thenReturn(s"Bearer $token")
+    val jWTExtractor = new JWTExtractor(request)
+    jWTExtractor.extractClientId() should equal(Some("fdjaskfljdlsafd.editorial-frontend"))
+    jWTExtractor.extractUserRoles() should equal(List.empty)
+    jWTExtractor.extractUserId() should be(None)
   }
 
   test("That all roles are extracted in legacy format") {
