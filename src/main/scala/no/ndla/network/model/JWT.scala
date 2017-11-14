@@ -32,7 +32,6 @@ object JWTClaims {
   val client_id_key = "https://ndla.no/client_id"
   val azp_key = "azp"
   val scope_key = "scope"
-  val client_id_value_markers = List("client", "netlife", "frontend")
 
   def apply(claims: JwtClaim): JWTClaims = {
     val content = {
@@ -47,6 +46,7 @@ object JWTClaims {
   }
 
   def legacyTokenParse(content: String) = {
+    val legacyClientIdValueMarkers = List("client", "netlife", "frontend")
     val legacyContent = parse(content).extract[Map[String, Any]]
 
     def conditionalEntry(key: String, value: Option[String]) = value match {
@@ -68,9 +68,9 @@ object JWTClaims {
       }
     }
 
-    def getLegacyNdlaId = getLegacyNdlaOrClientId.filter(x => !client_id_value_markers.exists(y => x.indexOf(y) > 0 ))
+    def getLegacyNdlaId = getLegacyNdlaOrClientId.filter(x => !legacyClientIdValueMarkers.exists(y => x.indexOf(y) > 0))
 
-    def getLegacyClientId = getLegacyNdlaOrClientId.filter(x => client_id_value_markers.exists(y => x.indexOf(y) > 0 ))
+    def getLegacyClientId = getLegacyNdlaOrClientId.filter(x => legacyClientIdValueMarkers.exists(y => x.indexOf(y) > 0))
 
     def getLegacyUserName = legacyContent.get("name").map(_.asInstanceOf[String])
 
