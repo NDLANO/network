@@ -32,10 +32,7 @@ class JWTExtractor(request: HttpServletRequest) {
 
   def extractUserRoles(): List[String] = {
     val rawRoles = jwtClaims.map(_.scope).getOrElse(List.empty)
-    val env = Properties.envOrElse("NDLA_ENVIRONMENT", "local") match {
-      case "local" => "test"
-      case x => x
-    }
+    val env = Properties.envOrElse("NDLA_ENVIRONMENT", "local")
     val envSuffix = s"-$env:"
     val roles = rawRoles.filter(_.contains(envSuffix)).map(_.replace(envSuffix, ":"))
     // Legacy-support. Don't remove roles without env-suffix. May be deleted when all clients are migrated to auth0 and the auth component is deleted
