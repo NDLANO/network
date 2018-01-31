@@ -38,9 +38,7 @@ class JWTExtractor(request: HttpServletRequest) {
     }
     val envSuffix = s"-$env:"
     val roles = rawRoles.filter(_.contains(envSuffix)).map(_.replace(envSuffix, ":"))
-    // Legacy-support. Don't remove roles without env-suffix. May be deleted when all clients are migrated to auth0 and the auth component is deleted
-    val legacyRoles = rawRoles.filter(!_.contains("-"))
-    roles ++ legacyRoles
+    roles
   }
 
   def extractUserName(): Option[String] = {
