@@ -19,6 +19,7 @@ lazy val network = (project in file(".")).
     javacOptions ++= Seq("-source", "1.8", "-target", "1.8"),
     scalacOptions := Seq("-target:jvm-1.8"),
     libraryDependencies ++= Seq(
+      "com.fasterxml.jackson.core" % "jackson-databind" % "2.8.11.1", // Overriding because of https://snyk.io/vuln/SNYK-JAVA-COMFASTERXMLJACKSONCORE-32111, and Json4s-jackson and aws-java-sdk-s3 is behind
       "org.json4s"   %% "json4s-jackson" % Json4sVersion,
       "org.json4s"   %% "json4s-native" % Json4sVersion,
       "org.scalaj" %% "scalaj-http" % "2.3.0",
