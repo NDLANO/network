@@ -27,7 +27,7 @@ trait NdlaClient {
         addCorrelationId(request))
     }
 
-    def fetchWithBasicAuth[A](request: HttpRequest, user: String, password: String)(implicit mf: Manifest[A], formats: Formats): Try[A] = {
+    def fetchWithBasicAuth[A](request: HttpRequest, user: String, password: String)(implicit mf: Manifest[A], formats: Formats = formats): Try[A] = {
       doFetch(
         addCorrelationId(
           addBasicAuth(request, user, password)))

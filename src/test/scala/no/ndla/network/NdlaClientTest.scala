@@ -9,7 +9,6 @@
 package no.ndla.network
 
 import javax.servlet.http.HttpServletRequest
-import org.json4s.Formats
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.TryValues._
@@ -101,8 +100,6 @@ class NdlaClientTest extends UnitSuite with NdlaClient {
   }
 
   test("That BasicAuth header is added to request when user and password is defined") {
-    implicit val formats: Formats = org.json4s.DefaultFormats
-
     val user = "user"
     val password = "password"
 
