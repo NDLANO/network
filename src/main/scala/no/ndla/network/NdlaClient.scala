@@ -10,6 +10,7 @@ package no.ndla.network
 
 import com.typesafe.scalalogging.LazyLogging
 import no.ndla.network.model.HttpRequestException
+import org.json4s.Formats
 import org.json4s.jackson.JsonMethods._
 
 import scala.util.{Failure, Success, Try}
@@ -19,30 +20,29 @@ trait NdlaClient {
   val ndlaClient: NdlaClient
 
   class NdlaClient extends LazyLogging {
-    implicit val formats = org.json4s.DefaultFormats
-
+    implicit val formats: Formats = org.json4s.DefaultFormats
 
     def fetch[A](request: HttpRequest)(implicit mf: Manifest[A]): Try[A] = {
       doFetch(
         addCorrelationId(request))
     }
 
-    def fetchWithBasicAuth[A](request: HttpRequest, user: String, password: String)(implicit mf: Manifest[A]): Try[A] = {
+    def fetchWithBasicAuth[A](request: HttpRequest, user: String, password: String)(implicit mf: Manifest[A], formats: Formats = formats): Try[A] = {
       doFetch(
         addCorrelationId(
           addBasicAuth(request, user, password)))
     }
 
-    def fetchWithForwardedAuth[A](request: HttpRequest)(implicit mf: Manifest[A]): Try[A] = {
+    def fetchWithForwardedAuth[A](request: HttpRequest)(implicit mf: Manifest[A], formats: Formats = formats): Try[A] = {
       doFetch(
         addCorrelationId(
           addForwardedAuth(request)))
     }
 
-    private def doFetch[A](request: HttpRequest)(implicit mf: Manifest[A]): Try[A] = {
+    private def doFetch[A](request: HttpRequest)(implicit mf: Manifest[A], formats: Formats = formats): Try[A] = {
       for {
         httpResponse <- doRequest(request)
-        bodyObject <- parseResponse[A](httpResponse)(mf)
+        bodyObject <- parseResponse[A](httpResponse)(mf, formats)
       } yield bodyObject
     }
 
@@ -57,7 +57,7 @@ trait NdlaClient {
       })
     }
 
-    private def parseResponse[A](response: HttpResponse[String])(implicit mf: Manifest[A]): Try[A] = {
+    private def parseResponse[A](response: HttpResponse[String])(implicit mf: Manifest[A], formats: Formats = formats): Try[A] = {
       Try(parse(response.body).camelizeKeys.extract[A]) match {
         case Success(extracted) => Success(extracted)
         case Failure(ex) => {
