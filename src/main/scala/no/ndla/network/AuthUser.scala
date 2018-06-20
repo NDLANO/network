@@ -9,11 +9,10 @@ package no.ndla.network
 
 import javax.servlet.http.HttpServletRequest
 
-import com.typesafe.scalalogging.LazyLogging
 import no.ndla.network.jwt.JWTExtractor
 
 
-object AuthUser extends LazyLogging {
+object AuthUser {
   private[this] def ThreadLocalWithDefault[T](default: T) = new ThreadLocal[T] {
     override protected def initialValue: T = default
   }

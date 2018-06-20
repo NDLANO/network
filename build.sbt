@@ -3,7 +3,6 @@ val CrossScalaVersions = "2.11.8"
 val ScalaTestVersion = "3.0.1"
 val MockitoVersion = "1.10.19"
 val AwsSdkversion = "1.11.297"
-val ScalaLoggingVersion = "3.5.0"
 val Json4sVersion = "3.5.3"
 val JacksonVersion = "2.8.11.1"
 
@@ -24,7 +23,6 @@ lazy val network = (project in file(".")).
       "org.json4s"   %% "json4s-jackson" % Json4sVersion,
       "org.json4s"   %% "json4s-native" % Json4sVersion,
       "org.scalaj" %% "scalaj-http" % "2.3.0",
-      "com.typesafe.scala-logging" %% "scala-logging" % ScalaLoggingVersion,
       "org.scalatest" %% "scalatest" % ScalaTestVersion % "test",
       "org.mockito" % "mockito-all" % MockitoVersion % "test",
       "javax.servlet" % "javax.servlet-api" % "3.1.0" % "provided;test",
