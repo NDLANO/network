@@ -7,10 +7,10 @@
 
 package no.ndla.network.jwt
 
-import javax.servlet.http.HttpServletRequest
-
 import no.ndla.network.UnitSuite
+import no.ndla.network.model.NdlaHttpRequest
 import org.mockito.Mockito.when
+import org.mockito.Matchers._
 
 class JWTExtractorTest extends UnitSuite {
 
@@ -24,27 +24,29 @@ class JWTExtractorTest extends UnitSuite {
   }
 
   test("That userId is None when no authorization header is set") {
-    new JWTExtractor(mock[HttpServletRequest]).extractUserId() should be(None)
+    val request = mock[NdlaHttpRequest]
+    when(request.getHeader(any[String])).thenReturn(None)
+    new JWTExtractor(request).extractUserId() should be (None)
   }
 
   test("That userId is None when an illegal JWT is set") {
-    val request = mock[HttpServletRequest]
-    when(request.getHeader("Authorization")).thenReturn("This is an invalid JWT")
+    val request = mock[NdlaHttpRequest]
+    when(request.getHeader("Authorization")).thenReturn(Some("This is an invalid JWT"))
 
     new JWTExtractor(request).extractUserId() should be(None)
   }
 
   test("That userId is None when no ndla_id is present") {
     val tokenWithoutUserId = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL25kbGEuZXUuYXV0aDAuY29tLyIsInN1YiI6Imdvb2dsZS1vYXV0aDJ8MDAwMDAwMDAwMCIsImF1ZCI6Im5kbGFfc3lzdGVtIiwiYXpwIjoiV1UwS3I0Q0Rrck0wdUwiLCJleHAiOjE1MDY1MTg3NjQsImlhdCI6MTUwNjM0NjkwMywic2NvcGUiOiJsaXN0aW5nLXRlc3Q6d3JpdGUgYXJ0aWNsZXMtdGVzdDp3cml0ZSBhcnRpY2xlcy1zdGFnaW5nOndyaXRlIGF1ZGlvLXN0YWdpbmc6d3JpdGUiLCJodHRwczovL25kbGEubm8vdXNlcl9uYW1lIjoiVGVzdCBUZXN0ZXNlbiIsImp0aSI6IjNmYmNlNDk1LTlmMDMtNDE0Ny1hNjcyLTVmZjYzOGVjMDkyNCJ9.aWQ2lqSXzsMgr_dd5S5xHKKGqPVRX7LdnH2nkSUlM-0"
-    val request = mock[HttpServletRequest]
-    when(request.getHeader("Authorization")).thenReturn(s"Bearer $tokenWithoutUserId")
+    val request = mock[NdlaHttpRequest]
+    when(request.getHeader("Authorization")).thenReturn(Some(s"Bearer $tokenWithoutUserId"))
     new JWTExtractor(request).extractUserId() should be(None)
   }
 
   test("That JWTExtractor.extractUserId is set even if roles are not present") {
     val tokenWithoutRoles = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL25kbGEuZXUuYXV0aDAuY29tLyIsInN1YiI6Imdvb2dsZS1vYXV0aDJ8MDAwMDAwMDAwMCIsImF1ZCI6Im5kbGFfc3lzdGVtIiwiYXpwIjoiV1UwS3I0Q0Rrck0wdUwiLCJleHAiOjE1MDY1MTc1ODQsImlhdCI6MTUwNjM0NjkwMywiaHR0cHM6Ly9uZGxhLm5vL25kbGFfaWQiOiJkZXR0ZV9lcl9lbl9uZGxhX2lkIiwiaHR0cHM6Ly9uZGxhLm5vL3VzZXJfbmFtZSI6IlRlc3QgVGVzdGVzZW4iLCJqdGkiOiJiNGVlZmQwZi0zNjg1LTQwMWItYjY3MC02MzUyY2NmNGQzNTgifQ.8vEYDokCZYAIz1Vq7R-NfU0NrcI9hpoIL7316fFYF_A"
-    val request = mock[HttpServletRequest]
-    when(request.getHeader("Authorization")).thenReturn(s"Bearer $tokenWithoutRoles")
+    val request = mock[NdlaHttpRequest]
+    when(request.getHeader("Authorization")).thenReturn(Some(s"Bearer $tokenWithoutRoles"))
     val jWTExtractor = new JWTExtractor(request)
     jWTExtractor.extractUserId() should equal(Some("dette_er_en_ndla_id"))
     jWTExtractor.extractUserRoles() should equal(List.empty)
@@ -53,8 +55,8 @@ class JWTExtractorTest extends UnitSuite {
   test("That all roles for correct environment are extracted") {
     setEnv("NDLA_ENVIRONMENT", "test")
 
-    val request = mock[HttpServletRequest]
-    when(request.getHeader("Authorization")).thenReturn(s"Bearer $token")
+    val request = mock[NdlaHttpRequest]
+    when(request.getHeader("Authorization")).thenReturn(Some(s"Bearer $token"))
 
     val jwtExtractor = new JWTExtractor(request)
     val roles = jwtExtractor.extractUserRoles()
@@ -64,8 +66,8 @@ class JWTExtractorTest extends UnitSuite {
   }
 
   test("That name is extracted") {
-    val request = mock[HttpServletRequest]
-    when(request.getHeader("Authorization")).thenReturn(s"Bearer $token")
+    val request = mock[NdlaHttpRequest]
+    when(request.getHeader("Authorization")).thenReturn(Some(s"Bearer $token"))
 
     val jwtExtractor = new JWTExtractor(request)
     val name = jwtExtractor.extractUserName() should equal(Some("Test Testesen"))

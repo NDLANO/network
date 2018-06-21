@@ -8,16 +8,15 @@
 package no.ndla.network.jwt
 
 import javax.servlet.http.HttpServletRequest
-
-import no.ndla.network.model.JWTClaims
+import no.ndla.network.model.{JWTClaims, NdlaHttpRequest}
 import pdi.jwt.{JwtJson4s, JwtOptions}
 
 import scala.util.{Failure, Properties, Success}
 
 
-class JWTExtractor(request: HttpServletRequest) {
+class JWTExtractor(request: NdlaHttpRequest) {
 
-  private val jwtClaims = Option(request.getHeader("Authorization")).flatMap(authHeader => {
+  private val jwtClaims = request.getHeader("Authorization").flatMap(authHeader => {
     val jwt = authHeader.replace("Bearer ", "")
     // Leaning on token validation being done somewhere else...
     JwtJson4s.decode(jwt, JwtOptions(signature = false, expiration = false)) match {
