@@ -8,7 +8,6 @@
 
 package no.ndla.network
 
-import com.typesafe.scalalogging.LazyLogging
 import no.ndla.network.model.HttpRequestException
 import org.json4s.Formats
 import org.json4s.jackson.JsonMethods._
@@ -19,7 +18,7 @@ import scalaj.http.{HttpRequest, HttpResponse}
 trait NdlaClient {
   val ndlaClient: NdlaClient
 
-  class NdlaClient extends LazyLogging {
+  class NdlaClient {
     implicit val formats: Formats = org.json4s.DefaultFormats
 
     def fetch[A](request: HttpRequest)(implicit mf: Manifest[A]): Try[A] = {
@@ -60,10 +59,8 @@ trait NdlaClient {
     private def parseResponse[A](response: HttpResponse[String])(implicit mf: Manifest[A], formats: Formats = formats): Try[A] = {
       Try(parse(response.body).camelizeKeys.extract[A]) match {
         case Success(extracted) => Success(extracted)
-        case Failure(ex) => {
-          logger.warn("Could not parse response", ex)
+        case Failure(ex) =>
           Failure(new HttpRequestException(s"Could not parse response ${response.body}", Some(response)))
-        }
       }
     }
 
