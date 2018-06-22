@@ -9,6 +9,7 @@
 package no.ndla.network
 
 import javax.servlet.http.HttpServletRequest
+import no.ndla.network.model.NdlaHttpRequest
 
 object ApplicationUrl {
   val X_FORWARDED_PROTO_HEADER = "X-Forwarded-Proto"
@@ -21,17 +22,19 @@ object ApplicationUrl {
 
   val applicationUrl = new ThreadLocal[String]
 
-  def set(request: HttpServletRequest) {
-    val xForwardedProtoHeaderProtocol = Option(request.getHeader(X_FORWARDED_PROTO_HEADER))
-    val forwardedHeaderProtocol = Option(request.getHeader(FORWARDED_HEADER)) flatMap (_.replaceAll("\\s","").split(";").find(_.contains(FORWARDED_PROTO)).map(_.dropWhile(c => c != '=').tail))
-    val schemeProtocol = if (request.getServerPort == HTTP_PORT || request.getServerPort == HTTPS_PORT) Some(request.getScheme) else None
+  def set(request: HttpServletRequest): Unit = set(NdlaHttpRequest(request))
+
+  def set(request: NdlaHttpRequest) {
+    val xForwardedProtoHeaderProtocol = request.getHeader(X_FORWARDED_PROTO_HEADER)
+    val forwardedHeaderProtocol = request.getHeader(FORWARDED_HEADER).flatMap(_.replaceAll("\\s","").split(";").find(_.contains(FORWARDED_PROTO)).map(_.dropWhile(c => c != '=').tail))
+    val schemeProtocol = if (request.serverPort == HTTP_PORT || request.serverPort == HTTPS_PORT) Some(request.getScheme) else None
 
     val chosenProtocol = List(forwardedHeaderProtocol, xForwardedProtoHeaderProtocol, schemeProtocol).find(x => x.isDefined && (x.get.equals(HTTP) || x.get.equals(HTTPS))).flatten
 
     if (chosenProtocol.isDefined)
-      applicationUrl.set(s"${chosenProtocol.get}://${request.getServerName}${request.getServletPath}/")
+      applicationUrl.set(s"${chosenProtocol.get}://${request.serverName}${request.servletPath}/")
     else
-      applicationUrl.set(s"${request.getScheme}://${request.getServerName}:${request.getServerPort}${request.getServletPath}/")
+      applicationUrl.set(s"${request.getScheme}://${request.serverName}:${request.serverPort}${request.servletPath}/")
   }
 
   def get: String = applicationUrl.get
