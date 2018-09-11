@@ -1,4 +1,4 @@
-val Scalaversion = "2.12.1"
+val Scalaversion = "2.12.6"
 val CrossScalaVersions = "2.11.8"
 val ScalaTestVersion = "3.0.1"
 val MockitoVersion = "1.10.19"
@@ -37,3 +37,4 @@ publishTo := {
   else
     Some("releases"  at nexus + "content/repositories/ndla-releases")
 }
+
