@@ -10,6 +10,9 @@ lazy val commonSettings = Seq(
   scalaVersion := Scalaversion
 )
 
+// Workaround for: https://github.com/sbt/sbt/issues/3570
+updateOptions := updateOptions.value.withGigahorse(false)
+
 lazy val network = (project in file("."))
   .settings(commonSettings: _*)
   .settings(
