@@ -16,7 +16,7 @@ object CorrelationID {
   def set(correlationId: Option[String]) = {
     correlationId match {
       case Some(x) => correlationID.set(x)
-      case None => correlationID.set(UUID.randomUUID().toString)
+      case None    => correlationID.set(UUID.randomUUID().toString)
     }
   }
 

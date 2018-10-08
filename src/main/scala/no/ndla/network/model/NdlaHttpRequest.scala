@@ -9,7 +9,6 @@ package no.ndla.network.model
 
 import javax.servlet.http.HttpServletRequest
 
-
 trait NdlaHttpRequest {
   def serverPort: Int
   def getHeader(name: String): Option[String]
@@ -19,6 +18,7 @@ trait NdlaHttpRequest {
 }
 
 object NdlaHttpRequest {
+
   def apply(req: HttpServletRequest): NdlaHttpRequest =
     new NdlaHttpRequest {
       override def serverPort: Int = req.getServerPort
@@ -28,4 +28,3 @@ object NdlaHttpRequest {
       override def servletPath: String = req.getServletPath
     }
 }
-

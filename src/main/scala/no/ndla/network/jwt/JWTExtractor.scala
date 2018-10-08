@@ -13,17 +13,18 @@ import pdi.jwt.{JwtJson4s, JwtOptions}
 
 import scala.util.{Failure, Properties, Success}
 
-
 class JWTExtractor(request: NdlaHttpRequest) {
 
-  private val jwtClaims = request.getHeader("Authorization").flatMap(authHeader => {
-    val jwt = authHeader.replace("Bearer ", "")
-    // Leaning on token validation being done somewhere else...
-    JwtJson4s.decode(jwt, JwtOptions(signature = false, expiration = false)) match {
-      case Success(claims) => Some(JWTClaims(claims))
-      case Failure(_) => None
-    }
-  })
+  private val jwtClaims = request
+    .getHeader("Authorization")
+    .flatMap(authHeader => {
+      val jwt = authHeader.replace("Bearer ", "")
+      // Leaning on token validation being done somewhere else...
+      JwtJson4s.decode(jwt, JwtOptions(signature = false, expiration = false)) match {
+        case Success(claims) => Some(JWTClaims(claims))
+        case Failure(_)      => None
+      }
+    })
 
   def extractUserId(): Option[String] = {
     jwtClaims.flatMap(_.ndla_id)
@@ -33,7 +34,7 @@ class JWTExtractor(request: NdlaHttpRequest) {
     val rawRoles = jwtClaims.map(_.scope).getOrElse(List.empty)
     val env = Properties.envOrElse("NDLA_ENVIRONMENT", "local") match {
       case "local" => "test"
-      case x => x
+      case x       => x
     }
     val envSuffix = s"-$env:"
     val roles = rawRoles.filter(_.contains(envSuffix)).map(_.replace(envSuffix, ":"))

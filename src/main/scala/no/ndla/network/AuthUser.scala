@@ -11,7 +11,6 @@ import javax.servlet.http.HttpServletRequest
 import no.ndla.network.jwt.JWTExtractor
 import no.ndla.network.model.NdlaHttpRequest
 
-
 object AuthUser {
   private val userId = ThreadLocal.withInitial[Option[String]](() => None)
   private val userRoles = ThreadLocal.withInitial[List[String]](() => List.empty)
@@ -52,4 +51,3 @@ object AuthUser {
     authHeader.remove()
   }
 }
-

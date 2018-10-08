@@ -23,7 +23,9 @@ object Secrets {
   def readSecrets(secretsFile: String): Try[Map[String, Option[String]]] =
     new Secrets(amazonClient, Properties.envOrElse("NDLA_ENVIRONMENT", "local"), secretsFile, DBKeys).readSecrets()
 
-  def readSecrets(secretsFile: String, secretsKeysToRead: Set[String], readDBCredentials: Boolean = true): Try[Map[String, Option[String]]] = {
+  def readSecrets(secretsFile: String,
+                  secretsKeysToRead: Set[String],
+                  readDBCredentials: Boolean = true): Try[Map[String, Option[String]]] = {
     val keysToRead = secretsKeysToRead ++ (if (readDBCredentials) DBKeys else Set())
     new Secrets(amazonClient, Properties.envOrElse("NDLA_ENVIRONMENT", "local"), secretsFile, keysToRead).readSecrets()
   }
@@ -58,9 +60,4 @@ class Secrets(amazonClient: AmazonS3, environment: String, secretsFile: String, 
 
 }
 
-case class Database(database: String,
-                    host: String,
-                    user: String,
-                    password: String,
-                    port: String,
-                    schema: String)
+case class Database(database: String, host: String, user: String, password: String, port: String, schema: String)
