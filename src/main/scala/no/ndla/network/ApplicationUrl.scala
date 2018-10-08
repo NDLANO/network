@@ -13,6 +13,7 @@ import no.ndla.network.model.NdlaHttpRequest
 
 object ApplicationUrl {
   val X_FORWARDED_PROTO_HEADER = "X-Forwarded-Proto"
+  val X_FORWARDED_HOST_HEADER = "X-Forwarded-Host"
   val FORWARDED_HEADER = "Forwarded"
   val FORWARDED_PROTO = "proto"
   val HTTP = "http"
@@ -26,15 +27,22 @@ object ApplicationUrl {
 
   def set(request: NdlaHttpRequest) {
     val xForwardedProtoHeaderProtocol = request.getHeader(X_FORWARDED_PROTO_HEADER)
-    val forwardedHeaderProtocol = request.getHeader(FORWARDED_HEADER).flatMap(_.replaceAll("\\s","").split(";").find(_.contains(FORWARDED_PROTO)).map(_.dropWhile(c => c != '=').tail))
-    val schemeProtocol = if (request.serverPort == HTTP_PORT || request.serverPort == HTTPS_PORT) Some(request.getScheme) else None
+    val forwardedHeaderProtocol = request
+      .getHeader(FORWARDED_HEADER)
+      .flatMap(
+        _.replaceAll("\\s", "").split(";").find(_.contains(FORWARDED_PROTO)).map(_.dropWhile(c => c != '=').tail))
+    val schemeProtocol =
+      if (request.serverPort == HTTP_PORT || request.serverPort == HTTPS_PORT) Some(request.getScheme) else None
 
-    val chosenProtocol = List(forwardedHeaderProtocol, xForwardedProtoHeaderProtocol, schemeProtocol).find(x => x.isDefined && (x.get.equals(HTTP) || x.get.equals(HTTPS))).flatten
+    val host = request.getHeader(X_FORWARDED_HOST_HEADER).getOrElse(request.serverName)
 
-    if (chosenProtocol.isDefined)
-      applicationUrl.set(s"${chosenProtocol.get}://${request.serverName}${request.servletPath}/")
-    else
-      applicationUrl.set(s"${request.getScheme}://${request.serverName}:${request.serverPort}${request.servletPath}/")
+    List(forwardedHeaderProtocol, xForwardedProtoHeaderProtocol, schemeProtocol).collectFirst {
+      case Some(protocol) if protocol == HTTP || protocol == HTTPS => protocol
+    } match {
+      case Some(protocol) => applicationUrl.set(s"$protocol://$host${request.servletPath}/")
+      case None =>
+        applicationUrl.set(s"${request.getScheme}://$host:${request.serverPort}${request.servletPath}/")
+    }
   }
 
   def get: String = applicationUrl.get
