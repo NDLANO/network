@@ -22,20 +22,18 @@ trait NdlaClient {
     implicit val formats: Formats = org.json4s.DefaultFormats
 
     def fetch[A](request: HttpRequest)(implicit mf: Manifest[A]): Try[A] = {
-      doFetch(
-        addCorrelationId(request))
+      doFetch(addCorrelationId(request))
     }
 
-    def fetchWithBasicAuth[A](request: HttpRequest, user: String, password: String)(implicit mf: Manifest[A], formats: Formats = formats): Try[A] = {
-      doFetch(
-        addCorrelationId(
-          addBasicAuth(request, user, password)))
+    def fetchWithBasicAuth[A](request: HttpRequest, user: String, password: String)(
+        implicit mf: Manifest[A],
+        formats: Formats = formats): Try[A] = {
+      doFetch(addCorrelationId(addBasicAuth(request, user, password)))
     }
 
-    def fetchWithForwardedAuth[A](request: HttpRequest)(implicit mf: Manifest[A], formats: Formats = formats): Try[A] = {
-      doFetch(
-        addCorrelationId(
-          addForwardedAuth(request)))
+    def fetchWithForwardedAuth[A](request: HttpRequest)(implicit mf: Manifest[A],
+                                                        formats: Formats = formats): Try[A] = {
+      doFetch(addCorrelationId(addForwardedAuth(request)))
     }
 
     private def doFetch[A](request: HttpRequest)(implicit mf: Manifest[A], formats: Formats = formats): Try[A] = {
@@ -50,13 +48,16 @@ trait NdlaClient {
         response.isError match {
           case false => Success(response)
           case true => {
-            Failure(new HttpRequestException(s"Received error ${response.code} ${response.statusLine} when calling ${request.url}. Body was ${response.body}", Some(response)))
+            Failure(new HttpRequestException(
+              s"Received error ${response.code} ${response.statusLine} when calling ${request.url}. Body was ${response.body}",
+              Some(response)))
           }
         }
       })
     }
 
-    private def parseResponse[A](response: HttpResponse[String])(implicit mf: Manifest[A], formats: Formats = formats): Try[A] = {
+    private def parseResponse[A](response: HttpResponse[String])(implicit mf: Manifest[A],
+                                                                 formats: Formats = formats): Try[A] = {
       Try(parse(response.body).camelizeKeys.extract[A]) match {
         case Success(extracted) => Success(extracted)
         case Failure(ex) =>
@@ -65,7 +66,7 @@ trait NdlaClient {
     }
 
     private def addCorrelationId(request: HttpRequest) = CorrelationID.get match {
-      case None => request
+      case None                => request
       case Some(correlationId) => request.header("X-Correlation-ID", correlationId)
     }
 
@@ -73,7 +74,7 @@ trait NdlaClient {
 
     private def addForwardedAuth(request: HttpRequest) = AuthUser.getHeader match {
       case Some(auth) => request.header("Authorization", auth)
-      case None => request
+      case None       => request
     }
   }
 }

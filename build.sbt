@@ -12,24 +12,24 @@ lazy val commonSettings = Seq(
   crossScalaVersions := Seq(CrossScalaVersions, Scalaversion)
 )
 
-lazy val network = (project in file(".")).
-  settings(commonSettings: _*).
-  settings(
+lazy val network = (project in file("."))
+  .settings(commonSettings: _*)
+  .settings(
     name := "network",
     javacOptions ++= Seq("-source", "1.8", "-target", "1.8"),
     scalacOptions := Seq("-target:jvm-1.8"),
     libraryDependencies ++= Seq(
       "com.fasterxml.jackson.core" % "jackson-databind" % JacksonVersion, // Overriding jackson-databind used in aws-java-sdk-s3 and json4s-jackson because of https://snyk.io/vuln/SNYK-JAVA-COMFASTERXMLJACKSONCORE-32111
-      "org.json4s"   %% "json4s-jackson" % Json4sVersion,
-      "org.json4s"   %% "json4s-native" % Json4sVersion,
+      "org.json4s" %% "json4s-jackson" % Json4sVersion,
+      "org.json4s" %% "json4s-native" % Json4sVersion,
       "org.scalaj" %% "scalaj-http" % "2.3.0",
       "org.scalatest" %% "scalatest" % ScalaTestVersion % "test",
       "org.mockito" % "mockito-all" % MockitoVersion % "test",
       "javax.servlet" % "javax.servlet-api" % "3.1.0" % "provided;test",
       "com.amazonaws" % "aws-java-sdk-s3" % AwsSdkversion,
-      "com.pauldijou" %% "jwt-json4s-native" % "0.14.0")
+      "com.pauldijou" %% "jwt-json4s-native" % "0.14.0"
+    )
   )
-
 
 val checkfmt = taskKey[Boolean]("Check for code style errors")
 checkfmt := {
@@ -54,6 +54,5 @@ publishTo := {
   if (isSnapshot.value)
     Some("snapshots" at nexus + "content/repositories/ndla-snapshots")
   else
-    Some("releases"  at nexus + "content/repositories/ndla-releases")
+    Some("releases" at nexus + "content/repositories/ndla-releases")
 }
-
