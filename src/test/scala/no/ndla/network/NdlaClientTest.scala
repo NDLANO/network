@@ -143,4 +143,27 @@ class NdlaClientTest extends UnitSuite with NdlaClient {
 
     verify(httpRequestMock, times(1)).header(eqTo(authHeaderKey), eqTo(authHeader))
   }
+
+  test("That fetchRawWithForwardedAuth can handle empty bodies") {
+    val servletRequestMock = mock[HttpServletRequest]
+    val httpRequestMock = mock[HttpRequest]
+    val authHeaderKey = "Authorization"
+    val authHeader = "abc"
+
+    when(servletRequestMock.getHeader(eqTo(authHeaderKey))).thenReturn(authHeader)
+    AuthUser.set(servletRequestMock)
+
+    val response = HttpResponse("", 204, Map.empty)
+
+    when(httpRequestMock.header(eqTo(authHeaderKey), eqTo(authHeader))).thenReturn(httpRequestMock)
+    when(httpRequestMock.asString).thenReturn(response)
+
+    val result = ndlaClient.fetchWithForwardedAuth[TestObject](httpRequestMock)
+    result.isSuccess should be(false)
+
+    val rawResult = ndlaClient.fetchRawWithForwardedAuth(httpRequestMock)
+    rawResult.isSuccess should be(true)
+    rawResult.get.body should be("")
+    rawResult.get.code should be(204)
+  }
 }
