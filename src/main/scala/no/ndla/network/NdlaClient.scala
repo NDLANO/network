@@ -13,7 +13,7 @@ import org.json4s.Formats
 import org.json4s.jackson.JsonMethods._
 
 import scala.util.{Failure, Success, Try}
-import scalaj.http.{HttpRequest, HttpResponse}
+import scalaj.http.{Http, HttpRequest, HttpResponse}
 
 trait NdlaClient {
   val ndlaClient: NdlaClient
@@ -34,6 +34,11 @@ trait NdlaClient {
     def fetchWithForwardedAuth[A](request: HttpRequest)(implicit mf: Manifest[A],
                                                         formats: Formats = formats): Try[A] = {
       doFetch(addCorrelationId(addForwardedAuth(request)))
+    }
+
+    /** Useful if response body is not json. */
+    def fetchRawWithForwardedAuth(request: HttpRequest): Try[HttpResponse[String]] = {
+      doRequest(addCorrelationId(addForwardedAuth(request)))
     }
 
     private def doFetch[A](request: HttpRequest)(implicit mf: Manifest[A], formats: Formats = formats): Try[A] = {
