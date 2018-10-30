@@ -1,9 +1,9 @@
-val Scalaversion = "2.12.6"
-val ScalaTestVersion = "3.0.1"
-val MockitoVersion = "1.10.19"
-val AwsSdkversion = "1.11.297"
-val Json4sVersion = "3.5.3"
-val JacksonVersion = "2.8.11.1"
+val Scalaversion = "2.12.7"
+val ScalaTestVersion = "3.0.5"
+val MockitoVersion = "2.23.0"
+val AwsSdkversion = "1.11.438"
+val Json4sVersion = "3.5.4"
+val JacksonVersion = "2.9.7"
 
 lazy val commonSettings = Seq(
   organization := "ndla",
@@ -23,12 +23,12 @@ lazy val network = (project in file("."))
       "com.fasterxml.jackson.core" % "jackson-databind" % JacksonVersion, // Overriding jackson-databind used in aws-java-sdk-s3 and json4s-jackson because of https://snyk.io/vuln/SNYK-JAVA-COMFASTERXMLJACKSONCORE-32111
       "org.json4s" %% "json4s-jackson" % Json4sVersion,
       "org.json4s" %% "json4s-native" % Json4sVersion,
-      "org.scalaj" %% "scalaj-http" % "2.3.0",
+      "org.scalaj" %% "scalaj-http" % "2.4.1",
       "org.scalatest" %% "scalatest" % ScalaTestVersion % "test",
-      "org.mockito" % "mockito-all" % MockitoVersion % "test",
-      "javax.servlet" % "javax.servlet-api" % "3.1.0" % "provided;test",
+      "org.mockito" % "mockito-core" % MockitoVersion % "test",
+      "javax.servlet" % "javax.servlet-api" % "4.0.1" % "provided;test",
       "com.amazonaws" % "aws-java-sdk-s3" % AwsSdkversion,
-      "com.pauldijou" %% "jwt-json4s-native" % "0.14.0"
+      "com.pauldijou" %% "jwt-json4s-native" % "0.19.0"
     )
   )
 
@@ -41,7 +41,7 @@ checkfmt := {
   noErrorsInMainFiles && noErrorsInTestFiles && noErrorsInSbtConfigFiles
 }
 
-Test / test := ((Test / test).dependsOn(Test / checkfmt)).value
+Test / test := (Test / test).dependsOn(Test / checkfmt).value
 
 val fmt = taskKey[Unit]("Automatically apply code style fixes")
 fmt := {
