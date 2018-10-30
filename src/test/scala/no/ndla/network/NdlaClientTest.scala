@@ -9,7 +9,7 @@
 package no.ndla.network
 
 import javax.servlet.http.HttpServletRequest
-import org.mockito.Matchers.{eq => eqTo, _}
+import org.mockito.ArgumentMatchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.TryValues._
 import scalaj.http.{HttpRequest, HttpResponse}

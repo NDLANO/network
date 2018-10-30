@@ -14,7 +14,7 @@ import com.amazonaws.services.s3.AmazonS3Client
 import com.amazonaws.services.s3.model.{S3Object, S3ObjectInputStream}
 import no.ndla.network.UnitSuite
 import org.apache.http.client.methods.HttpRequestBase
-import org.mockito.Matchers._
+import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito._
 
 import scala.util.{Failure, Success}

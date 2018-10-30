@@ -11,9 +11,8 @@ package no.ndla.network
 import no.ndla.network.model.HttpRequestException
 import org.json4s.Formats
 import org.json4s.jackson.JsonMethods._
-
+import scalaj.http.{HttpRequest, HttpResponse}
 import scala.util.{Failure, Success, Try}
-import scalaj.http.{Http, HttpRequest, HttpResponse}
 
 trait NdlaClient {
   val ndlaClient: NdlaClient
