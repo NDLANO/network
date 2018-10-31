@@ -28,7 +28,8 @@ lazy val network = (project in file("."))
       "org.mockito" % "mockito-core" % MockitoVersion % "test",
       "javax.servlet" % "javax.servlet-api" % "4.0.1" % "provided;test",
       "com.amazonaws" % "aws-java-sdk-s3" % AwsSdkversion,
-      "com.pauldijou" %% "jwt-json4s-native" % "0.19.0"
+      "com.pauldijou" %% "jwt-json4s-native" % "0.15.0",
+      "org.bouncycastle" % "bcprov-jdk15on" % "1.60" // Overriding bouncycastle used in jwt-json4s-native: https://app.snyk.io/vuln/SNYK-JAVA-ORGBOUNCYCASTLE-32412
     )
   )
 
