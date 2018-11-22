@@ -26,9 +26,7 @@ class JWTExtractor(request: NdlaHttpRequest) {
       }
     })
 
-  def extractUserId(): Option[String] = {
-    jwtClaims.flatMap(_.ndla_id)
-  }
+  def extractUserId(): Option[String] = jwtClaims.flatMap(_.ndla_id)
 
   def extractUserRoles(): List[String] = {
     val rawRoles = jwtClaims.map(_.scope).getOrElse(List.empty)
@@ -37,16 +35,13 @@ class JWTExtractor(request: NdlaHttpRequest) {
       case x       => x
     }
     val envSuffix = s"-$env:"
-    val roles = rawRoles.filter(_.contains(envSuffix)).map(_.replace(envSuffix, ":"))
-    roles
+    // Handle both types of role formats. Both with and without env-suffix.
+    // Support for old role formats will be removed in one of the next releases
+    rawRoles.filter(r => r.contains(envSuffix) || !r.contains("-")).map(_.replace(envSuffix, ":"))
   }
 
-  def extractUserName(): Option[String] = {
-    jwtClaims.flatMap(_.user_name)
-  }
+  def extractUserName(): Option[String] = jwtClaims.flatMap(_.user_name)
 
-  def extractClientId(): Option[String] = {
-    jwtClaims.flatMap(_.client_id)
-  }
+  def extractClientId(): Option[String] = jwtClaims.flatMap(_.azp)
 
 }

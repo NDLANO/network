@@ -15,7 +15,10 @@ import org.mockito.ArgumentMatchers._
 class JWTExtractorTest extends UnitSuite {
 
   val token =
-    "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL25kbGEuZXUuYXV0aDAuY29tLyIsInN1YiI6Imdvb2dsZS1vYXV0aDJ8MDAwMDAwMDAwMCIsImF1ZCI6Im5kbGFfc3lzdGVtIiwiYXpwIjoiV1UwS3I0Q0Rrck0wdUwiLCJleHAiOjE1MDYzNTI4NjEsImlhdCI6MTUwNjM0NjkwMywic2NvcGUiOiJsaXN0aW5nLXRlc3Q6d3JpdGUgYXJ0aWNsZXMtdGVzdDp3cml0ZSBhcnRpY2xlcy1zdGFnaW5nOndyaXRlIGF1ZGlvLXN0YWdpbmc6d3JpdGUiLCJodHRwczovL25kbGEubm8vbmRsYV9pZCI6ImRldHRlX2VyX2VuX25kbGFfaWQiLCJodHRwczovL25kbGEubm8vdXNlcl9uYW1lIjoiVGVzdCBUZXN0ZXNlbiIsImp0aSI6Ijg5MzAwNjhhLTMxOTMtNGNiOC04YjU2LWU3NTcyN2FiN2ZkNSJ9.UXmiSZL0ftV1fix7aVDMeFa1T23nB2ufT-6qdInrtes"
+    "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL25kbGEtdGVzdC5ldS5hdXRoMC5jb20vIiwic3ViIjoiZ29vZ2xlLW9hdXRoMnwwMDAwMDAwMDAwIiwiYXVkIjoibmRsYV9zeXN0ZW0iLCJhenAiOiJXVTBLcjRDRGtyTTB1TCIsImV4cCI6MTUwNjM1Mjg2MSwiaWF0IjoxNTA2MzQ2OTAzLCJzY29wZSI6Imxpc3RpbmctdGVzdDp3cml0ZSBhcnRpY2xlcy1zdGFnaW5nOndyaXRlIGF1ZGlvLXN0YWdpbmc6d3JpdGUgZHJhZnRzOndyaXRlIiwiaHR0cHM6Ly9uZGxhLm5vL25kbGFfaWQiOiJkZXR0ZV9lcl9lbl9uZGxhX2lkIiwiaHR0cHM6Ly9uZGxhLm5vL3VzZXJfbmFtZSI6IlRlc3QgVGVzdGVzZW4iLCJqdGkiOiI4OTMwMDY4YS0zMTkzLTRjYjgtOGI1Ni1lNzU3MjdhYjdmZDUifQ.RMGlftkqu2kPvN9JWo5L3aaJMPS19sVfgINZtfPFhTM"
+
+  val tokenWithCustomClientIdField =
+    "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL25kbGEtdGVzdC5ldS5hdXRoMC5jb20vIiwic3ViIjoiZ29vZ2xlLW9hdXRoMnwwMDAwMDAwMDAwIiwiYXVkIjoibmRsYV9zeXN0ZW0iLCJhenAiOiJXVTBLcjRDRGtyTTB1TCIsImV4cCI6MTUwNjM1Mjg2MSwiaWF0IjoxNTA2MzQ2OTAzLCJzY29wZSI6Imxpc3RpbmctdGVzdDp3cml0ZSBhcnRpY2xlcy1zdGFnaW5nOndyaXRlIGF1ZGlvLXN0YWdpbmc6d3JpdGUgZHJhZnRzOndyaXRlIiwiaHR0cHM6Ly9uZGxhLm5vL25kbGFfaWQiOiJkZXR0ZV9lcl9lbl9uZGxhX2lkIiwiaHR0cHM6Ly9uZGxhLm5vL3VzZXJfbmFtZSI6IlRlc3QgVGVzdGVzZW4iLCJodHRwczovL25kbGEubm8vY2xpZW50X2lkIjoia2xkc2ZqYWxza2RmaiIsImp0aSI6Ijg5MzAwNjhhLTMxOTMtNGNiOC04YjU2LWU3NTcyN2FiN2ZkNSJ9.lXCVD0dGN564GZa6MYwcUA40eD_8IO1kVEfXdLgTB3g"
 
   def setEnv(key: String, value: String) = {
     val field = System.getenv().getClass.getDeclaredField("m")
@@ -65,7 +68,7 @@ class JWTExtractorTest extends UnitSuite {
     val roles = jwtExtractor.extractUserRoles()
     roles.size should be(2)
     roles.contains("listing:write") should be(true)
-    roles.contains("articles:write") should be(true)
+    roles.contains("drafts:write") should be(true)
   }
 
   test("That name is extracted") {
@@ -73,6 +76,14 @@ class JWTExtractorTest extends UnitSuite {
     when(request.getHeader("Authorization")).thenReturn(Some(s"Bearer $token"))
 
     val jwtExtractor = new JWTExtractor(request)
-    val name = jwtExtractor.extractUserName() should equal(Some("Test Testesen"))
+    jwtExtractor.extractUserName() should equal(Some("Test Testesen"))
+  }
+
+  test("client id should be extracted from the 'azp' field instead of custom ndla client_id field") {
+    val request = mock[NdlaHttpRequest]
+    when(request.getHeader("Authorization")).thenReturn(Some(s"Bearer $tokenWithCustomClientIdField"))
+
+    val jwtExtractor = new JWTExtractor(request)
+    jwtExtractor.extractClientId() should equal(Some("WU0Kr4CDkrM0uL"))
   }
 }

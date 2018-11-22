@@ -21,16 +21,17 @@ case class JWTClaims(
     ndla_id: Option[String],
     user_name: Option[String],
     jti: Option[String],
+    @deprecated("Will be removed in one of the next releases")
     client_id: Option[String]
 )
 
 object JWTClaims {
   implicit val formats = org.json4s.DefaultFormats
-  val ndla_id_key = "https://ndla.no/ndla_id"
-  val user_name_key = "https://ndla.no/user_name"
-  val client_id_key = "https://ndla.no/client_id"
-  val azp_key = "azp"
-  val scope_key = "scope"
+  private val ndla_id_key = "https://ndla.no/ndla_id"
+  private val user_name_key = "https://ndla.no/user_name"
+  private val client_id_key = "https://ndla.no/client_id"
+  private val azp_key = "azp"
+  private val scope_key = "scope"
 
   def apply(claims: JwtClaim): JWTClaims = {
     val content = parse(claims.content).extract[Map[String, String]]

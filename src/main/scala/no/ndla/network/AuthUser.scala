@@ -12,6 +12,15 @@ import no.ndla.network.jwt.JWTExtractor
 import no.ndla.network.model.NdlaHttpRequest
 
 object AuthUser {
+
+  def getAuth0HostForEnv(env: String): String = {
+    Map("prod" -> "ndla.eu.auth0.com",
+        "staging" -> "ndla-staging.eu.auth0.com",
+        "test" -> "ndla-test.eu.auth0.com",
+        "local" -> "ndla-test.eu.auth0.com",
+    ).withDefaultValue("ndla-test.eu.auth0.com")(env)
+  }
+
   private val userId = ThreadLocal.withInitial[Option[String]](() => None)
   private val userRoles = ThreadLocal.withInitial[List[String]](() => List.empty)
   private val userName = ThreadLocal.withInitial[Option[String]](() => None)
