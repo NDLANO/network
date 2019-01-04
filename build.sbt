@@ -3,7 +3,7 @@ val ScalaTestVersion = "3.0.5"
 val MockitoVersion = "2.23.0"
 val AwsSdkversion = "1.11.438"
 val Json4sVersion = "3.5.4"
-val JacksonVersion = "2.9.7"
+val JacksonVersion = "2.9.8"
 
 lazy val commonSettings = Seq(
   organization := "ndla",
@@ -20,7 +20,7 @@ lazy val network = (project in file("."))
     javacOptions ++= Seq("-source", "1.8", "-target", "1.8"),
     scalacOptions := Seq("-target:jvm-1.8"),
     libraryDependencies ++= Seq(
-      "com.fasterxml.jackson.core" % "jackson-databind" % JacksonVersion, // Overriding jackson-databind used in aws-java-sdk-s3 and json4s-jackson because of https://snyk.io/vuln/SNYK-JAVA-COMFASTERXMLJACKSONCORE-32111
+      "com.fasterxml.jackson.core" % "jackson-databind" % JacksonVersion, // Overriding jackson-databind used in dependencies because of https://app.snyk.io/vuln/SNYK-JAVA-COMFASTERXMLJACKSONCORE-72884
       "org.json4s" %% "json4s-jackson" % Json4sVersion,
       "org.json4s" %% "json4s-native" % Json4sVersion,
       "org.scalaj" %% "scalaj-http" % "2.4.1",
