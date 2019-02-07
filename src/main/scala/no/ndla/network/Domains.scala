@@ -6,6 +6,6 @@ object Domains {
     Map(
       "local" -> "http://api-gateway.ndla-local",
       "prod" -> "https://api.ndla.no"
-    ).getOrElse(environment, s"https://$environment.api.ndla.no")
+    ).getOrElse(environment, s"https://${environment.replace('_', '-')}.api.ndla.no")
 
 }
