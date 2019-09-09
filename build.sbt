@@ -1,5 +1,5 @@
 val Scalaversion = "2.13.0"
-val ScalaTestVersion = "3.0.5"
+val ScalaTestVersion = "3.0.8"
 val MockitoVersion = "2.23.0"
 val AwsSdkversion = "1.11.438"
 val Json4sVersion = "3.5.4"
