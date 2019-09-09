@@ -25,7 +25,7 @@ object ApplicationUrl {
 
   def set(request: HttpServletRequest): Unit = set(NdlaHttpRequest(request))
 
-  def set(request: NdlaHttpRequest) {
+  def set(request: NdlaHttpRequest): Unit = {
     val xForwardedProtoHeaderProtocol = request.getHeader(X_FORWARDED_PROTO_HEADER)
     val forwardedHeaderProtocol = request
       .getHeader(FORWARDED_HEADER)

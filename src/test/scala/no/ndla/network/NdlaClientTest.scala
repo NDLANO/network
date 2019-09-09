@@ -46,7 +46,7 @@ class NdlaClientTest extends UnitSuite with NdlaClient {
 
     val result = ndlaClient.fetch[TestObject](httpRequestMock)
 
-    result should be a 'failure
+    result.isFailure should be(true)
     result.failure.exception.getMessage should equal(
       "Received error 123 status when calling someUrl. Body was body-with-error")
   }
@@ -61,7 +61,7 @@ class NdlaClientTest extends UnitSuite with NdlaClient {
     when(httpResponseMock.body).thenReturn(unparseableResponse)
 
     val result = ndlaClient.fetch[TestObject](httpRequestMock)
-    result should be a 'failure
+    result.isFailure should be(true)
     result.failure.exception.getMessage should equal(s"Could not parse response $unparseableResponse")
   }
 
@@ -74,7 +74,7 @@ class NdlaClientTest extends UnitSuite with NdlaClient {
     when(httpResponseMock.body).thenReturn(ParseableContent)
 
     val result = ndlaClient.fetch[TestObject](httpRequestMock)
-    result should be a 'success
+    result.isSuccess should be(true)
     result.get.id should equal("1")
     result.get.verdi should equal("This is the value")
 
@@ -93,7 +93,7 @@ class NdlaClientTest extends UnitSuite with NdlaClient {
     when(httpResponseMock.body).thenReturn(ParseableContent)
 
     val result = ndlaClient.fetch[TestObject](httpRequestMock)
-    result should be a 'success
+    result.isSuccess should be(true)
     result.get.id should equal("1")
     result.get.verdi should equal("This is the value")
 
@@ -113,7 +113,7 @@ class NdlaClientTest extends UnitSuite with NdlaClient {
     when(httpResponseMock.body).thenReturn(ParseableContent)
 
     val result = ndlaClient.fetchWithBasicAuth[TestObject](httpRequestMock, user, password)
-    result should be a 'success
+    result.isSuccess should be(true)
     result.get.id should equal("1")
     result.get.verdi should equal("This is the value")
 
@@ -137,7 +137,7 @@ class NdlaClientTest extends UnitSuite with NdlaClient {
     when(httpResponseMock.body).thenReturn(ParseableContent)
 
     val result = ndlaClient.fetchWithForwardedAuth[TestObject](httpRequestMock)
-    result should be a 'success
+    result.isSuccess should be(true)
     result.get.id should equal("1")
     result.get.verdi should equal("This is the value")
 

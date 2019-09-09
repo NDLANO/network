@@ -20,16 +20,13 @@ case class JWTClaims(
     scope: List[String],
     ndla_id: Option[String],
     user_name: Option[String],
-    jti: Option[String],
-    @deprecated("Will be removed in one of the next releases")
-    client_id: Option[String]
+    jti: Option[String]
 )
 
 object JWTClaims {
   implicit val formats = org.json4s.DefaultFormats
   private val ndla_id_key = "https://ndla.no/ndla_id"
   private val user_name_key = "https://ndla.no/user_name"
-  private val client_id_key = "https://ndla.no/client_id"
   private val azp_key = "azp"
   private val scope_key = "scope"
 
@@ -45,8 +42,7 @@ object JWTClaims {
       content.get(scope_key).map(_.split(' ').toList).getOrElse(List.empty),
       content.get(ndla_id_key),
       content.get(user_name_key),
-      claims.jwtId,
-      content.get(client_id_key)
+      claims.jwtId
     )
   }
 }

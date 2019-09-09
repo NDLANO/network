@@ -9,7 +9,7 @@
 package no.ndla.network
 
 import org.scalatest._
-import org.scalatest.mock.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 
 abstract class UnitSuite
     extends FunSuite
