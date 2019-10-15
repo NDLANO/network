@@ -17,6 +17,7 @@ class AuthUserTest extends UnitSuite {
     AuthUser.getAuth0HostForEnv("local") should equal("ndla-test.eu.auth0.com")
     AuthUser.getAuth0HostForEnv("staging") should equal("ndla-staging.eu.auth0.com")
     AuthUser.getAuth0HostForEnv("prod") should equal("ndla.eu.auth0.com")
+    AuthUser.getAuth0HostForEnv("ff") should equal("ndla.eu.auth0.com")
   }
 
   test("getAuth0HostForEnv should return the test hostname for any undefined environments") {
