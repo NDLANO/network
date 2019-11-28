@@ -20,13 +20,6 @@ class JWTExtractorTest extends UnitSuite {
   val tokenWithCustomClientIdField =
     "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL25kbGEtdGVzdC5ldS5hdXRoMC5jb20vIiwic3ViIjoiZ29vZ2xlLW9hdXRoMnwwMDAwMDAwMDAwIiwiYXVkIjoibmRsYV9zeXN0ZW0iLCJhenAiOiJXVTBLcjRDRGtyTTB1TCIsImV4cCI6MTUwNjM1Mjg2MSwiaWF0IjoxNTA2MzQ2OTAzLCJzY29wZSI6Imxpc3RpbmctdGVzdDp3cml0ZSBhcnRpY2xlcy1zdGFnaW5nOndyaXRlIGF1ZGlvLXN0YWdpbmc6d3JpdGUgZHJhZnRzOndyaXRlIiwiaHR0cHM6Ly9uZGxhLm5vL25kbGFfaWQiOiJkZXR0ZV9lcl9lbl9uZGxhX2lkIiwiaHR0cHM6Ly9uZGxhLm5vL3VzZXJfbmFtZSI6IlRlc3QgVGVzdGVzZW4iLCJodHRwczovL25kbGEubm8vY2xpZW50X2lkIjoia2xkc2ZqYWxza2RmaiIsImp0aSI6Ijg5MzAwNjhhLTMxOTMtNGNiOC04YjU2LWU3NTcyN2FiN2ZkNSJ9.lXCVD0dGN564GZa6MYwcUA40eD_8IO1kVEfXdLgTB3g"
 
-  def setEnv(key: String, value: String) = {
-    val field = System.getenv().getClass.getDeclaredField("m")
-    field.setAccessible(true)
-    val map = field.get(System.getenv()).asInstanceOf[java.util.Map[java.lang.String, java.lang.String]]
-    map.put(key, value)
-  }
-
   test("That userId is None when no authorization header is set") {
     val request = mock[NdlaHttpRequest]
     when(request.getHeader(any[String])).thenReturn(None)
@@ -59,16 +52,16 @@ class JWTExtractorTest extends UnitSuite {
   }
 
   test("That all roles for correct environment are extracted") {
-    setEnv("NDLA_ENVIRONMENT", "test")
+    withEnv("NDLA_ENVIRONMENT", Some("test")) {
+      val request = mock[NdlaHttpRequest]
+      when(request.getHeader("Authorization")).thenReturn(Some(s"Bearer $token"))
 
-    val request = mock[NdlaHttpRequest]
-    when(request.getHeader("Authorization")).thenReturn(Some(s"Bearer $token"))
-
-    val jwtExtractor = new JWTExtractor(request)
-    val roles = jwtExtractor.extractUserRoles()
-    roles.size should be(2)
-    roles.contains("listing:write") should be(true)
-    roles.contains("drafts:write") should be(true)
+      val jwtExtractor = new JWTExtractor(request)
+      val roles = jwtExtractor.extractUserRoles()
+      roles.size should be(2)
+      roles.contains("listing:write") should be(true)
+      roles.contains("drafts:write") should be(true)
+    }
   }
 
   test("That name is extracted") {
