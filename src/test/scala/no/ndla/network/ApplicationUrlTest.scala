@@ -138,7 +138,7 @@ class ApplicationUrlTest extends UnitSuite {
     withEnv("NDLA_ENVIRONMENT", Some("test")) {
       ApplicationUrl.set(httpRequest)
       val gotten = ApplicationUrl.get
-      gotten should equal(s"https://test.api.ndla.no${path}/")
+      gotten should equal(s"https://api.test.ndla.no${path}/")
     }
   }
 }
