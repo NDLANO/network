@@ -3,7 +3,7 @@ val ScalaTestVersion = "3.0.8"
 val MockitoVersion = "2.23.0"
 val AwsSdkversion = "1.11.438"
 val Json4sVersion = "3.6.7"
-val JacksonVersion = "2.9.10.1"
+val JacksonVersion = "2.9.10.2"
 
 lazy val commonSettings = Seq(
   organization := "ndla",
