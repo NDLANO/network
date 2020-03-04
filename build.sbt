@@ -1,13 +1,22 @@
-val Scalaversion = "2.12.8"
+val scala213 = "2.13.1"
+val scala212 = "2.12.10"
+val Scalaversion = scala213
+
 val ScalaTestVersion = "3.0.8"
 val MockitoVersion = "2.23.0"
 val AwsSdkversion = "1.11.438"
 val Json4sVersion = "3.6.7"
 val JacksonVersion = "2.9.10.2"
 
+lazy val supportedScalaVersions = List(
+  scala213,
+  scala212
+)
+
 lazy val commonSettings = Seq(
   organization := "ndla",
-  scalaVersion := Scalaversion
+  scalaVersion := Scalaversion,
+  crossScalaVersions := supportedScalaVersions
 )
 
 // Workaround for: https://github.com/sbt/sbt/issues/3570
