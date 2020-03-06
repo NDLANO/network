@@ -2,8 +2,8 @@ val scala213 = "2.13.1"
 val scala212 = "2.12.10"
 val Scalaversion = scala213
 
-val ScalaTestVersion = "3.0.8"
-val MockitoVersion = "2.23.0"
+val ScalaTestVersion = "3.1.1"
+val MockitoVersion = "1.11.4"
 val AwsSdkversion = "1.11.438"
 val Json4sVersion = "3.6.7"
 val JacksonVersion = "2.9.10.2"
@@ -34,7 +34,8 @@ lazy val network = (project in file("."))
       "org.json4s" %% "json4s-native" % Json4sVersion,
       "org.scalaj" %% "scalaj-http" % "2.4.2",
       "org.scalatest" %% "scalatest" % ScalaTestVersion % "test",
-      "org.mockito" % "mockito-core" % MockitoVersion % "test",
+      "org.mockito" %% "mockito-scala" % MockitoVersion % "test",
+      "org.mockito" %% "mockito-scala-scalatest" % MockitoVersion % "test",
       "javax.servlet" % "javax.servlet-api" % "4.0.1" % "provided;test",
       "com.amazonaws" % "aws-java-sdk-s3" % AwsSdkversion,
       "com.pauldijou" %% "jwt-json4s-native" % "4.0.0",

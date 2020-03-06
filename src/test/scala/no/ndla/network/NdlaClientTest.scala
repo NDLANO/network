@@ -78,7 +78,7 @@ class NdlaClientTest extends UnitSuite with NdlaClient {
     result.get.id should equal("1")
     result.get.verdi should equal("This is the value")
 
-    verify(httpRequestMock, never()).header(any[String], any[String])
+    verify(httpRequestMock, never).header(any[String], any[String])
   }
 
   test("That CorrelationID is added to request if set on ThreadContext") {
@@ -118,7 +118,7 @@ class NdlaClientTest extends UnitSuite with NdlaClient {
     result.get.verdi should equal("This is the value")
 
     verify(httpRequestMock, times(1)).auth(eqTo(user), eqTo(password))
-    verify(httpRequestMock, never()).header(any[String], any[String])
+    verify(httpRequestMock, never).header(any[String], any[String])
   }
 
   test("That Authorization header is added to request if set on Thread") {

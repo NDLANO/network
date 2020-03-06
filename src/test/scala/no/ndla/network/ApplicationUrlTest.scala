@@ -10,7 +10,7 @@ package no.ndla.network
 
 import javax.servlet.http.HttpServletRequest
 
-import org.mockito.Mockito._
+import org.mockito.ArgumentMatchers._
 
 class ApplicationUrlTest extends UnitSuite {
 
@@ -23,6 +23,7 @@ class ApplicationUrlTest extends UnitSuite {
   override def beforeEach(): Unit = {
     reset(httpRequest)
     when(httpRequest.getServerName).thenReturn(servername)
+    when(httpRequest.getHeader(anyString)).thenReturn(null)
     when(httpRequest.getScheme).thenReturn(scheme)
     when(httpRequest.getServerPort).thenReturn(port)
     when(httpRequest.getServletPath).thenReturn(path)
