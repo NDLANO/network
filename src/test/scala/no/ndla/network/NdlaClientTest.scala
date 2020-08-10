@@ -28,7 +28,7 @@ class NdlaClientTest extends UnitSuite with NdlaClient {
 
   val ndlaClient: NdlaClient = new NdlaClient
 
-  override def beforeEach = {
+  override def beforeEach() = {
     CorrelationID.clear()
   }
 

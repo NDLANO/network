@@ -1,12 +1,12 @@
-val scala213 = "2.13.1"
+val scala213 = "2.13.3"
 val scala212 = "2.12.10"
 val Scalaversion = scala213
 
-val ScalaTestVersion = "3.1.1"
-val MockitoVersion = "1.11.4"
+val ScalaTestVersion = "3.2.1"
+val MockitoVersion = "1.14.8"
 val AwsSdkversion = "1.11.438"
 val Json4sVersion = "3.6.7"
-val JacksonVersion = "2.9.10.2"
+val JacksonVersion = "2.10.5"
 
 lazy val supportedScalaVersions = List(
   scala213,
@@ -22,6 +22,12 @@ lazy val commonSettings = Seq(
 // Workaround for: https://github.com/sbt/sbt/issues/3570
 updateOptions := updateOptions.value.withGigahorse(false)
 
+// Sometimes we override transitive dependencies because of vulnerabilities, we put these here
+val vulnerabilityOverrides = Seq(
+  "com.fasterxml.jackson.core" % "jackson-databind" % JacksonVersion,
+  "commons-codec" % "commons-codec" % "1.14"
+)
+
 lazy val network = (project in file("."))
   .settings(commonSettings: _*)
   .settings(
@@ -29,7 +35,6 @@ lazy val network = (project in file("."))
     javacOptions ++= Seq("-source", "1.8", "-target", "1.8"),
     scalacOptions := Seq("-target:jvm-1.8", "-deprecation"),
     libraryDependencies ++= Seq(
-      "com.fasterxml.jackson.core" % "jackson-databind" % JacksonVersion, // Overriding jackson-databind used in dependencies because of https://app.snyk.io/vuln/SNYK-JAVA-COMFASTERXMLJACKSONCORE-72884
       "org.json4s" %% "json4s-jackson" % Json4sVersion,
       "org.json4s" %% "json4s-native" % Json4sVersion,
       "org.scalaj" %% "scalaj-http" % "2.4.2",
@@ -38,9 +43,8 @@ lazy val network = (project in file("."))
       "org.mockito" %% "mockito-scala-scalatest" % MockitoVersion % "test",
       "javax.servlet" % "javax.servlet-api" % "4.0.1" % "provided;test",
       "com.amazonaws" % "aws-java-sdk-s3" % AwsSdkversion,
-      "com.pauldijou" %% "jwt-json4s-native" % "4.0.0",
-      "org.bouncycastle" % "bcprov-jdk15on" % "1.60" // Overriding bouncycastle used in jwt-json4s-native: https://app.snyk.io/vuln/SNYK-JAVA-ORGBOUNCYCASTLE-32412
-    )
+      "com.pauldijou" %% "jwt-json4s-native" % "4.3.0"
+    ) ++ vulnerabilityOverrides
   )
 
 val checkfmt = taskKey[Boolean]("Check for code style errors")
