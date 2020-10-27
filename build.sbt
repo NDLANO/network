@@ -25,7 +25,8 @@ updateOptions := updateOptions.value.withGigahorse(false)
 // Sometimes we override transitive dependencies because of vulnerabilities, we put these here
 val vulnerabilityOverrides = Seq(
   "com.fasterxml.jackson.core" % "jackson-databind" % JacksonVersion,
-  "commons-codec" % "commons-codec" % "1.14"
+  "commons-codec" % "commons-codec" % "1.14",
+  "org.apache.httpcomponents" % "httpclient" % "4.5.13"
 )
 
 lazy val network = (project in file("."))
