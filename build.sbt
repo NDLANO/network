@@ -6,7 +6,7 @@ val ScalaTestVersion = "3.2.1"
 val MockitoVersion = "1.14.8"
 val AwsSdkversion = "1.11.438"
 val Json4sVersion = "3.6.7"
-val JacksonVersion = "2.10.5"
+val JacksonVersion = "2.12.1"
 
 lazy val supportedScalaVersions = List(
   scala213,
@@ -24,7 +24,9 @@ updateOptions := updateOptions.value.withGigahorse(false)
 
 // Sometimes we override transitive dependencies because of vulnerabilities, we put these here
 val vulnerabilityOverrides = Seq(
+  "com.fasterxml.jackson.core" % "jackson-core" % JacksonVersion,
   "com.fasterxml.jackson.core" % "jackson-databind" % JacksonVersion,
+  "com.fasterxml.jackson.module" %% "jackson-module-scala" % JacksonVersion,
   "commons-codec" % "commons-codec" % "1.14",
   "org.apache.httpcomponents" % "httpclient" % "4.5.13"
 )
