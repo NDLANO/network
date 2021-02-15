@@ -1,5 +1,5 @@
 # NETWORK
-[![Build Status](https://travis-ci.org/NDLANO/network.svg?branch=master)](https://travis-ci.org/NDLANO/network)
+![CI](https://github.com/NDLANO/network/workflows/CI/badge.svg)
 
 Library that provides common network functionality to NDLA components.
 
