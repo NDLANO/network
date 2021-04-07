@@ -55,8 +55,7 @@ trait NdlaClient {
           case true => {
             Failure(new HttpRequestException(
               s"Received error ${response.code} ${response.statusLine} when calling ${request.url}. Body was ${response.body}",
-              Some(response),
-              None
+              Some(response)
             ))
           }
         }
