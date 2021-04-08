@@ -19,6 +19,7 @@ trait NdlaClient {
 
   class NdlaClient {
     implicit val formats: Formats = org.json4s.DefaultFormats
+    private val ResponseErrorBodyCharacterCutoff = 1000
 
     def fetch[A](request: HttpRequest)(implicit mf: Manifest[A]): Try[A] = {
       doFetch(addCorrelationId(request))
@@ -54,7 +55,8 @@ trait NdlaClient {
           case true => {
             Failure(new HttpRequestException(
               s"Received error ${response.code} ${response.statusLine} when calling ${request.url}. Body was ${response.body}",
-              Some(response)))
+              Some(response)
+            ))
           }
         }
       })
@@ -64,8 +66,16 @@ trait NdlaClient {
                                                                  formats: Formats = formats): Try[A] = {
       Try(parse(response.body).camelizeKeys.extract[A]) match {
         case Success(extracted) => Success(extracted)
-        case Failure(ex) =>
-          Failure(new HttpRequestException(s"Could not parse response ${response.body}", Some(response)))
+        case Failure(ex)        =>
+          // Large bodies in the error message can be very noisy.
+          // If they are actually needed the `httpResponse` field of the exception can be used
+          val errBody =
+            if (response.body.length > ResponseErrorBodyCharacterCutoff)
+              s"'${response.body.substring(0, 1000)}'... (Cut off)"
+            else response.body
+
+          val newEx = new HttpRequestException(s"Could not parse response with body: $errBody", Some(response))
+          Failure(newEx.initCause(ex))
       }
     }
 

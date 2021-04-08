@@ -62,7 +62,7 @@ class NdlaClientTest extends UnitSuite with NdlaClient {
 
     val result = ndlaClient.fetch[TestObject](httpRequestMock)
     result.isFailure should be(true)
-    result.failure.exception.getMessage should equal(s"Could not parse response $unparseableResponse")
+    result.failure.exception.getMessage should equal(s"Could not parse response with body: $unparseableResponse")
   }
 
   test("That a testObject is returned when no error is returned and content is parseable") {
