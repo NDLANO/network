@@ -79,4 +79,31 @@ class JWTExtractorTest extends UnitSuite {
     val jwtExtractor = new JWTExtractor(request)
     jwtExtractor.extractClientId() should equal(Some("WU0Kr4CDkrM0uL"))
   }
+
+  test("Permissions in tokens should work as expected and be merged with scope") {
+    val token =
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IlF6bEVPVFE1TTBOR01EazROakV4T0VKR01qYzJNalZGT0RoRVFrRTFOVUkyTmtFMFJUUXlSZyJ9.eyJpc3MiOiJodHRwczovL25kbGEtdGVzdC5ldS5hdXRoMC5jb20vIiwic3ViIjoiZnNleE9DZkpGR09LdXkxQzJlNzFPc3ZRd3EwTldLQUtAY2xpZW50cyIsImF1ZCI6Im5kbGFfc3lzdGVtIiwiaWF0IjoxNjM0NzIzNTM5LCJleHAiOjE2MzQ3MjcxMzksImF6cCI6ImZzZXhPQ2ZKRkdPS3V5MUMyZTcxT3N2UXdxME5XS0FLIiwic2NvcGUiOiJhcnRpY2xlczpwdWJsaXNoIiwiZ3R5IjoiY2xpZW50LWNyZWRlbnRpYWxzIiwicGVybWlzc2lvbnMiOlsiYXJ0aWNsZXM6d3JpdGUiLCJhdWRpbzp3cml0ZSIsImNvbmNlcHQ6d3JpdGUiLCJkcmFmdHM6YWRtaW4iLCJkcmFmdHM6cHVibGlzaCIsImRyYWZ0czp3cml0ZSIsImltYWdlczp3cml0ZSIsImxlYXJuaW5ncGF0aDphZG1pbiIsImxlYXJuaW5ncGF0aDpwdWJsaXNoIiwibGVhcm5pbmdwYXRoOndyaXRlIiwidGF4b25vbXk6YWRtaW4iLCJ0YXhvbm9teTp3cml0ZSJdfQ.3iGSXuBaFtRmKvWYHu2C6zi2WhQ3yQhEmoVelp7pGCg"
+
+    val request = mock[NdlaHttpRequest]
+    when(request.getHeader("Authorization")).thenReturn(Some(s"Bearer $token"))
+
+    val jw = new JWTExtractor(request)
+    val res = jw.extractUserRoles()
+    res should be(
+      List(
+        "articles:publish",
+        "articles:write",
+        "audio:write",
+        "concept:write",
+        "drafts:admin",
+        "drafts:publish",
+        "drafts:write",
+        "images:write",
+        "learningpath:admin",
+        "learningpath:publish",
+        "learningpath:write",
+        "taxonomy:admin",
+        "taxonomy:write"
+      ))
+  }
 }

@@ -3,10 +3,9 @@ val scala212 = "2.12.10"
 val Scalaversion = scala213
 
 val ScalaTestVersion = "3.2.1"
-val MockitoVersion = "1.14.8"
-val AwsSdkversion = "1.11.438"
-val Json4sVersion = "3.6.7"
-val JacksonVersion = "2.12.1"
+val MockitoVersion = "1.16.46"
+val Json4sVersion = "4.0.3"
+val JacksonVersion = "2.13.0"
 
 lazy val supportedScalaVersions = List(
   scala213,
@@ -45,8 +44,7 @@ lazy val network = (project in file("."))
       "org.mockito" %% "mockito-scala" % MockitoVersion % "test",
       "org.mockito" %% "mockito-scala-scalatest" % MockitoVersion % "test",
       "javax.servlet" % "javax.servlet-api" % "4.0.1" % "provided;test",
-      "com.amazonaws" % "aws-java-sdk-s3" % AwsSdkversion,
-      "com.pauldijou" %% "jwt-json4s-native" % "4.3.0"
+      "com.github.jwt-scala" %% "jwt-json4s-native" % "9.0.2"
     ) ++ vulnerabilityOverrides
   )
 
