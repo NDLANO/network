@@ -25,23 +25,31 @@ case class JWTClaims(
 
 object JWTClaims {
   implicit val formats = org.json4s.DefaultFormats
-  private val ndla_id_key = "https://ndla.no/ndla_id"
-  private val user_name_key = "https://ndla.no/user_name"
-  private val azp_key = "azp"
-  private val scope_key = "scope"
+
+  case class ClaimsJSON(
+      azp: Option[String],
+      scope: Option[String],
+      `https://ndla.no/ndla_id`: Option[String],
+      `https://ndla.no/user_name`: Option[String],
+      permissions: Option[List[String]]
+  )
 
   def apply(claims: JwtClaim): JWTClaims = {
-    val content = parse(claims.content).extract[Map[String, String]]
+    val content = parse(claims.content).extract[ClaimsJSON]
+    val oldScopes = content.scope.map(_.split(' ').toList).getOrElse(List.empty)
+    val newPermissions = content.permissions.getOrElse(List.empty)
+    val mergedScopes = (oldScopes ++ newPermissions).distinct
+
     new JWTClaims(
       claims.issuer,
       claims.subject,
       claims.audience,
-      content.get(azp_key),
+      content.azp,
       claims.expiration,
       claims.issuedAt,
-      content.get(scope_key).map(_.split(' ').toList).getOrElse(List.empty),
-      content.get(ndla_id_key),
-      content.get(user_name_key),
+      mergedScopes,
+      content.`https://ndla.no/ndla_id`,
+      content.`https://ndla.no/user_name`,
       claims.jwtId
     )
   }
